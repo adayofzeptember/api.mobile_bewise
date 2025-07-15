@@ -1,0 +1,14 @@
+# ไฟล์ env ที่เก็บรหัสลับ
+.env
+.env.production
+
+# Node modules ที่ไม่ควร push
+node_modules/
+router/
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# อื่น ๆ ที่ควร ignore
+.DS_Store
