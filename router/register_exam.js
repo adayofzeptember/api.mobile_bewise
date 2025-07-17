@@ -314,7 +314,7 @@ register_exam_router.get('/register_info', verifyToken, (req, res) => {
         }
 
         if (results.length === 0) {
-            return res.status(404).json({ error: 'No registration data found' });
+            return res.status(404).json({ error: 'No registration data cccccc found' });
         }
 
         const data = results[0];
