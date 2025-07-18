@@ -353,13 +353,18 @@ register_exam_router.get('/gbpayCheck', verifyToken, (req, res) => {
 
             });
         }
-        else if (results[0].status == "00" || results.length > 0) {
-            res.status(200).json({
+          res.status(200).json({
                 status_code: '1',
                 message: 'จ่ายแล้ว',
 
             });
-        }
+        // else if (results[0].status == "00" || results.length > 0) {
+        //     res.status(200).json({
+        //         status_code: '1',
+        //         message: 'จ่ายแล้ว',
+
+        //     });
+        // }
 
     });
 
