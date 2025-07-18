@@ -6,9 +6,9 @@ const bcrypt = require('bcryptjs');
 const randomString = require('../functions/random_string');
 const verifyToken = require('../functions/auth');
 
-
+//!
 user_data_router.get('/get_branch', (req, res) => {
-    const query_checkRole = "SELECT code_branch FROM branch WHERE code_branch = 'BWG_R1_OCT_2025'";
+    const query_checkRole = "SELECT code_branch FROM branch WHERE code_branch = 'BWG_R1_APRIL_2026'";
     db_bewsie.query(query_checkRole, (err, results) => {
         if (err) {
             console.error('ERROR QUERY ---> ', err.message);

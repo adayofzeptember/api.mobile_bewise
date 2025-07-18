@@ -187,7 +187,7 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
 
     //! เช็ค docs
     if (check == 'docs') {
- 
+
 
         const queryCheckDocs = 'SELECT file_idcard, file_gpa FROM dataregister_2026_april_r1 WHERE id_customer = ?';
 
@@ -329,7 +329,7 @@ register_exam_router.get('/register_info', verifyToken, (req, res) => {
             province: data.provinces,
             zip_code: data.zip_code
         };
-        
+
         delete data.dataadd;
         delete data.districts;
         delete data.amphures;
@@ -343,7 +343,7 @@ register_exam_router.get('/register_info', verifyToken, (req, res) => {
 register_exam_router.get('/gbpayCheck', verifyToken, (req, res) => {
 
     const { ref } = req.body;
-    const check_gb_pay = 'SELECT status, ref_no FROM data_gb_prime_pay WHERE ref_no = ?';
+    const check_gb_pay = 'SELECT status, idcard_std FROM data_gb_prime_pay WHERE idcard_std = ?';
 
     db_bewsie.query(check_gb_pay, [ref], (err, results) => {
         if (err || results.length === 0) {
@@ -353,11 +353,14 @@ register_exam_router.get('/gbpayCheck', verifyToken, (req, res) => {
 
             });
         }
-        res.status(200).json({
-            status_code: '1',
-            message: 'จ่ายแล้ว',
+        else if (results[0].status == "00" || results.length > 0) {
+            res.status(200).json({
+                status_code: '1',
+                message: 'จ่ายแล้ว',
 
-        });
+            });
+        }
+
     });
 
     // db_bewsie.query(check_gb_pay, [ref], (err, results) => {

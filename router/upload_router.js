@@ -8,7 +8,7 @@ const db_bewsie = require('../db/db_bewise');
 const verifyToken = require('../functions/auth');
 
 
-
+//!
 const baseUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/uploads/${currentYear}/mod_customer`;
 const fileUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/file_BWG_Oct_R1_25`;
 
