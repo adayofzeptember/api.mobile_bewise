@@ -217,9 +217,9 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
             }
 
             else {
-                const queryCheckPay = 'SELECT idcard_std FROM data_gb_prime_pay WHERE ref_no = ?';
-                const { ref_no } = req.body;
-                db_bewsie.query(queryCheckPay, [ref_no], (err, results) => {
+                const queryCheckPay = 'SELECT idcard_std FROM data_gb_prime_pay WHERE idcard_std = ?';
+                const { idcard_std } = req.body;
+                db_bewsie.query(queryCheckPay, [idcard_std], (err, results) => {
                     if (err) {
                         return res.status(400).json({ error: 'เช็ค payment error ' + err.message });
                     }
