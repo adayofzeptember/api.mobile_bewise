@@ -184,8 +184,6 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
 
     //! เช็ค docs
     if (check == 'docs') {
-
-
         const queryCheckDocs = 'SELECT file_idcard, file_gpa FROM dataregister_2026_april_r1 WHERE id_customer = ?';
 
         db_bewsie.query(queryCheckDocs, [userId], (err, results) => {
@@ -225,12 +223,14 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
                     }
                     else {
 
-                        if (results.length == 0) {
-                            return res.status(200).json({ message: 'not yet', "code": "payment-0", "data": "ยังไม่จ่ายเงิน" });
-                        }
-                        else {
-                            return res.status(200).json({ message: 'paid', "code": "payment-1", "data": "จ่ายเงินแล้ว" });
-                        }
+                        return res.status(200).json({ message: results.length });
+
+                        // if (results.length == 0) {
+                        //     return res.status(200).json({ message: 'not yet', "code": "payment-0", "data": "ยังไม่จ่ายเงิน" });
+                        // }
+                        // else {
+                        //     return res.status(200).json({ message: 'paid', "code": "payment-1", "data": "จ่ายเงินแล้ว" });
+                        // }
                     }
                 });
             }
