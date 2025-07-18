@@ -4,9 +4,6 @@ const register_exam_router = express.Router();
 const verifyToken = require('../functions/auth');
 const user_data_router = require('./user_data_router');
 
-
-
-
 register_exam_router.post('/register', verifyToken, async (req, res) => {
     const { format, constructFrom } = require('date-fns');
 

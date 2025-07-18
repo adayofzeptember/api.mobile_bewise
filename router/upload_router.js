@@ -8,9 +8,10 @@ const db_bewsie = require('../db/db_bewise');
 const verifyToken = require('../functions/auth');
 
 
-//!
+//!  dynamic
 const baseUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/uploads/${currentYear}/mod_customer`;
-const fileUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/file_BWG_Oct_R1_25`;
+
+const fileUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/file_BWG_April_R1_2026`;
 
 
 //---------------------------------------------------------------
@@ -41,7 +42,7 @@ const storageFile = multer.diskStorage({
 });
 //---------------------------------------------------------------------------------
 
-
+//* pdf, pic
 const uploadImage = multer({
     storage: storageProfileImage,
     limits: { fileSize: 2 * 1024 * 1024 },
@@ -142,12 +143,13 @@ upload_router.post('/upload_profile_pic', verifyToken, uploadImage.single('photo
     });
 });
 
+
 upload_router.post('/upload_file', verifyToken, uploadFile.single('file'), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ message: "ไม่ได้อัปโหลดไฟล์" });
     }
     //! แก้ได้ รับค่ามาจาก แอป api branch
-    const filePath = `file_BWG_Oct_R1_25/${req.file.filename}`;
+    const filePath = `file_BWG_April_R1_2026/${req.file.filename}`;
     const directory = path.dirname(filePath) + '/';
     const filename = path.basename(filePath);
     res.json({
