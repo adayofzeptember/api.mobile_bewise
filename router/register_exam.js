@@ -342,22 +342,23 @@ register_exam_router.get('/register_info', verifyToken, (req, res) => {
 //* gbpay check 
 register_exam_router.get('/gbpayCheck', verifyToken, (req, res) => {
 
-    const { ref } = req.body;
-    const check_gb_pay = 'SELECT status, idcard_std FROM data_gb_prime_pay WHERE idcard_std = ?';
+    const { idcard_std } = req.body;
+    const check_gb_pay = 'SELECT idcard_std FROM data_gb_prime_pay WHERE idcard_std = ?';
 
-    db_bewsie.query(check_gb_pay, [ref], (err, results) => {
-        if (err || results.length === 0) {
+    db_bewsie.query(check_gb_pay, [idcard_std], (err, results) => {
+        if (err || results.length == 0) {
             return res.status(200).json({
                 status_code: '0',
                 message: 'ยังไม่จ่าย'
 
             });
         }
-          res.status(200).json({
-                status_code: '1',
-                message: 'จ่ายแล้ว',
 
-            });
+        return res.status(200).json({
+            // status_code: '1',
+            // message: 'จ่ายแล้ว',
+            results
+        });
         // else if (results[0].status == "00" || results.length > 0) {
         //     res.status(200).json({
         //         status_code: '1',
