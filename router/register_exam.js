@@ -223,7 +223,7 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
                     }
                     else {
 
-                   return res.status(200).json({ length: results.length });
+                        return res.status(200).json({ length: results.length });
 
 
                         // if (results.length == 0) {
