@@ -223,15 +223,15 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
                     }
                     else {
 
-                  return res.status(200).json({ length: results.length });
+                      //  return res.status(200).json({ length: results.length });
 
 
-                        // if (results.length == 0) {
-                        //     return res.status(200).json({ message: 'not yet', "code": "payment-0", "data": "ยังไม่จ่ายเงิน" });
-                        // }
-                        // else {
-                        //     return res.status(200).json({ message: 'paid', "code": "payment-1", "data": "จ่ายเงินแล้ว" });
-                        // }
+                        if (results.length == 0) {
+                            return res.status(200).json({ message: 'not yet', "code": "payment-0", "data": "ยังไม่จ่ายเงิน" });
+                        }
+                        else {
+                            return res.status(200).json({ message: 'paid', "code": "payment-1", "data": "จ่ายเงินแล้ว" });
+                        }
                     }
                 });
             }
