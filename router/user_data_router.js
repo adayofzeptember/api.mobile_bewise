@@ -399,7 +399,7 @@ user_data_router.get('/get_history_participate', verifyToken, (req, res) => {
             UNION ALL
             SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2025_july_r2
             UNION ALL
-            SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2025_oct_r1
+            SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2026_april_r1
         ) AS d
         LEFT JOIN branch AS b 
         ON d.branch COLLATE utf8_unicode_ci = b.code_branch COLLATE utf8_unicode_ci

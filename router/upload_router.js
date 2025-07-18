@@ -8,6 +8,7 @@ const db_bewsie = require('../db/db_bewise');
 const verifyToken = require('../functions/auth');
 
 
+
 const baseUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/uploads/${currentYear}/mod_customer`;
 const fileUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/file_BWG_Oct_R1_25`;
 
@@ -53,21 +54,17 @@ const uploadFile = multer({
         fileSize: 2 * 1024 * 1024
     },
 });
- 
 
 
 
 //---------------------------------------------------------------------------------            
 upload_router.post('/upload_profile_pic', verifyToken, uploadImage.single('photo'), (req, res) => {
-
     if (!req.file) {
         return res.status(400).json({ message: "ไม่ได้อัปโหลดไฟล์" });
     }
-
-
     //?setup----------------------------------------------------------------------------------------
     const { format } = require('date-fns');
-
+ 
     const formattedDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
     const userID = req.user.userId; // Assuming JWT payload has { id: "12345" }
     const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${currentYear}/mod_customer/${req.file.filename}`;
@@ -92,7 +89,7 @@ upload_router.post('/upload_profile_pic', verifyToken, uploadImage.single('photo
             WHERE id_user = ?`;
             db_bewsie.query(query_update_address, [filename, formattedDate, directory, 1, userID], (err, resCheck) => {
                 if (err) {
-          
+
                     console.error('insert image ERROR --->', err.message);
                     return res.status(500).json({ message: 'Internal Server Error' });
                 }
@@ -103,7 +100,7 @@ upload_router.post('/upload_profile_pic', verifyToken, uploadImage.single('photo
 
                         path: req.file.path,
                         filename: req.file.filename,
-                     //   url: fileUrl,
+                        //   url: fileUrl,
                         date: formattedDate,
                         for_database_insert: {
                             dir: directory,
