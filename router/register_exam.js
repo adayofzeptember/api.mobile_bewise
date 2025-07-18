@@ -223,7 +223,8 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
                     }
                     else {
 
-                        return res.status(200).json({ message: results.length });
+                  return res.status(200).json({ length: results.length });
+
 
                         // if (results.length == 0) {
                         //     return res.status(200).json({ message: 'not yet', "code": "payment-0", "data": "ยังไม่จ่ายเงิน" });
@@ -353,7 +354,7 @@ register_exam_router.get('/gbpayCheck', verifyToken, (req, res) => {
 
 
         else if (results[0].status == "00" || results.length > 0) {
-          return res.status(200).json({
+            return res.status(200).json({
                 status_code: '1',
                 message: 'จ่ายแล้ว',
 
