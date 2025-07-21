@@ -174,7 +174,21 @@ register_exam_router.post('/insert_payment/:id', verifyToken, (req, res) => {
 });
 
 
+//? เช็คสมัครรึยัง
+register_exam_router.get('/check_register', verifyToken, (req, res) => {
 
+    const userId = req.user.userId;
+
+    const queryCheckRegis = 'SELECT id_customer FROM dataregister_2026_april_r1 WHERE id_customer = ?';
+    db_bewsie.query(queryCheckRegis, [userId], (err, results) => {
+        if (results.length == 0) {
+            return res.status(200).json({ message: 'ยังไม่สมัคร' });
+        }
+        return res.status(200).json({ message: 'สมัครไปแล้ว' });
+
+    });
+
+});
 
 //? get to check เอกสาร, ชำระเงิน
 
