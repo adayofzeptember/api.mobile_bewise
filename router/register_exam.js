@@ -184,7 +184,7 @@ register_exam_router.get('/check_register', verifyToken, (req, res) => {
         if (results.length == 0) {
             return res.status(200).json({ message: 'ยังไม่สมัคร' });
         }
-        return res.status(200).json({ message: 'สมัครไปแล้ว' });
+        return res.status(200).json({ message: 'เคยสมัครไปแล้ว' });
 
     });
 
