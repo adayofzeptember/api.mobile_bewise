@@ -251,7 +251,7 @@ const storageFile = multer.diskStorage({
 const uploadImage = multer({
     storage: storageProfileImage,
     limits: { fileSize: 2 * 1024 * 1024 },
-    fileFilter: imageOnlyFilter,
+   // fileFilter: imageOnlyFilter,   //? เาอออกได้
 });
 
 const uploadFile = multer({
