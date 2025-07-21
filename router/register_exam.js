@@ -309,10 +309,16 @@ register_exam_router.get('/register_info', verifyToken, (req, res) => {
         if (err) {
             return res.status(400).json({ error: 'error: ' + err.message });
         }
-
         if (results.length === 0) {
-            return res.status(404).json({ error: 'No registration data cccccc found' });
+            return res.status(200).json({
+                data: null,
+                message: 'No registration data found'
+            });
         }
+
+        // if (results.length === 0) {
+        //     return res.status(404).json({ error: 'No registration data cccccc found' });
+        // }
 
         const data = results[0];
         data.datetime = {
