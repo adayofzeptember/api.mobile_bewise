@@ -182,9 +182,9 @@ register_exam_router.get('/check_register', verifyToken, (req, res) => {
     const queryCheckRegis = 'SELECT * FROM dataregister_2026_april_r1 WHERE id_customer = ?';
     db_bewsie.query(queryCheckRegis, [userId], (err, results) => {
         if (results.length == 0) {
-            return res.status(200).json({ message: 'ยังไม่สมัคร' });
+            return res.status(200).json({ message: 'ยังไม่สมัคร' , status: 0});
         }
-        return res.status(200).json({ message: 'เคยสมัครไปแล้ว' });
+        return res.status(200).json({ message: 'เคยสมัครไปแล้ว' , status: 1});
 
     });
 
