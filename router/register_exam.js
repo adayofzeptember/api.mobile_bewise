@@ -179,7 +179,7 @@ register_exam_router.get('/check_register', verifyToken, (req, res) => {
 
     const userId = req.user.userId;
 
-    const queryCheckRegis = 'SELECT id_customer FROM dataregister_2026_april_r1 WHERE id_customer = ?';
+    const queryCheckRegis = 'SELECT * FROM dataregister_2026_april_r1 WHERE id_customer = ?';
     db_bewsie.query(queryCheckRegis, [userId], (err, results) => {
         if (results.length == 0) {
             return res.status(200).json({ message: 'ยังไม่สมัคร' });
@@ -190,7 +190,9 @@ register_exam_router.get('/check_register', verifyToken, (req, res) => {
 
 });
 
+
 //? get to check เอกสาร, ชำระเงิน
+
 
 register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
     const check = req.params.type_check;
