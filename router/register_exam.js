@@ -182,9 +182,9 @@ register_exam_router.get('/check_register', verifyToken, (req, res) => {
     const queryCheckRegis = 'SELECT * FROM dataregister_2026_april_r1 WHERE id_customer = ?';
     db_bewsie.query(queryCheckRegis, [userId], (err, results) => {
         if (results.length == 0) {
-            return res.status(200).json({ message: 'ยังไม่สมัคร' , status: 0});
+            return res.status(200).json({ message: 'ยังไม่สมัคร', status: 0 });
         }
-        return res.status(200).json({ message: 'เคยสมัครไปแล้ว' , status: 1});
+        return res.status(200).json({ message: 'เคยสมัครไปแล้ว', status: 1 });
 
     });
 
@@ -362,7 +362,7 @@ register_exam_router.get('/register_info', verifyToken, (req, res) => {
 //* gbpay check 
 register_exam_router.get('/gbpayCheck', verifyToken, (req, res) => {
 
-    const { idcard_std } = req.body;
+    const { idcard_std } = req.query;
     const check_gb_pay = 'SELECT status, idcard_std FROM data_gb_prime_pay WHERE idcard_std = ?';
 
     db_bewsie.query(check_gb_pay, [idcard_std], (err, results) => {
@@ -373,8 +373,6 @@ register_exam_router.get('/gbpayCheck', verifyToken, (req, res) => {
 
             });
         }
-
-
         else if (results[0].status == "00" || results.length > 0) {
             return res.status(200).json({
                 status_code: '1',
@@ -385,19 +383,6 @@ register_exam_router.get('/gbpayCheck', verifyToken, (req, res) => {
 
     });
 
-    // db_bewsie.query(check_gb_pay, [ref], (err, results) => {
-    //     if (err || results.length === 0) {
-    //         return res.status(200).json({
-    //             status_code: '0',
-    //             message: 'ยังไม่จ่าย',
-    //         });
-    //     } 
-    //     res.status(200).json({
-    //         status_code: '1',
-    //         message: 'จ่ายแล้ว',
-    //         //  data: results[0]
-    //     });
-    // });
 });
 
 module.exports = register_exam_router;
