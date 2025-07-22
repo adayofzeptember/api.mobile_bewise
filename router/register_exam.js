@@ -369,7 +369,7 @@ register_exam_router.get('/gbpayCheck', verifyToken, (req, res) => {
         if (err || results.length == 0) {
             return res.status(200).json({
                 status_code: '0',
-                message: 'ยังไม่จ่าย'
+                message: 'ยังไม่จ่ายด'
 
             });
         }
