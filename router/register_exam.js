@@ -338,7 +338,7 @@ register_exam_router.get('/register_info', verifyToken, (req, res) => {
 
         const data = results[0];
         data.datetime = {
-            date: '04 พฤษภาคม 2568',
+            date: '31 สิงหาคม 2568',
             time: '12.00 - 14.30 น.'
         };
 
