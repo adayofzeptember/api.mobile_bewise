@@ -176,9 +176,7 @@ register_exam_router.post('/insert_payment/:id', verifyToken, (req, res) => {
 
 //? เช็คสมัครรึยัง
 register_exam_router.get('/check_register', verifyToken, (req, res) => {
-
     const userId = req.user.userId;
-
     const queryCheckRegis = 'SELECT * FROM dataregister_2026_april_r2 WHERE id_customer = ?';
     db_bewsie.query(queryCheckRegis, [userId], (err, results) => {
         if (results.length == 0) {
