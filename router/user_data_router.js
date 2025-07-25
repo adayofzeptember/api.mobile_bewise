@@ -83,6 +83,7 @@ user_data_router.post('/register', async (req, res) => {
             return;
         }
         if (resCheckDup.length > 0) {
+
             return res.status(400).json({ success: false, message: 'อีเมลนี้เคยลงทะเบียนไว้แล้ว' });
         } else {
             const insert_user_query = `INSERT INTO users 

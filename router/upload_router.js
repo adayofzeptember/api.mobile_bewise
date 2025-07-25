@@ -186,11 +186,11 @@ const currentYear = new Date().getFullYear();
 const db_bewsie = require('../db/db_bewise');
 const verifyToken = require('../functions/auth');
 
-// Path
+//! Path    
 const baseUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/uploads/${currentYear}/mod_customer`;
 const fileUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/file_BWG_April_R1_2026`;
 
-// MIME Types
+ 
 const imageMimeTypes = [
     'image/jpeg',
     'image/png',
@@ -257,7 +257,7 @@ const uploadImage = multer({
 const uploadFile = multer({
     storage: storageFile,
     limits: { fileSize: 2 * 1024 * 1024 },
-    fileFilter: imageAndPdfFilter,
+    //fileFilter: imageAndPdfFilter,
 });
 
 // Upload Profile Image
