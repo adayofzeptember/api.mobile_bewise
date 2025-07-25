@@ -204,22 +204,6 @@ const imageAndPdfMimeTypes = [
     'application/pdf'
 ];
 
-// File Filters
-const imageOnlyFilter = (req, file, cb) => {
-    if (imageMimeTypes.includes(file.mimetype)) {
-        cb(null, true);
-    } else {
-        cb(new Error('ไฟล์ต้องเป็นรูปภาพเท่านั้น (jpg, png, webp, gif)'), false);
-    }
-};
-
-const imageAndPdfFilter = (req, file, cb) => {
-    if (imageAndPdfMimeTypes.includes(file.mimetype)) {
-        cb(null, true);
-    } else {
-        cb(new Error('อนุญาตเฉพาะไฟล์รูปภาพหรือ PDF เท่านั้น'), false);
-    }
-};
 
 // Storage for profile image
 const storageProfileImage = multer.diskStorage({
@@ -291,7 +275,6 @@ upload_router.post('/upload_profile_pic', verifyToken, uploadImage.single('photo
                     console.error('insert image ERROR --->', err.message);
                     return res.status(500).json({ message: 'Internal Server Error' });
                 }
-
                 return res.status(201).json({
                     message: "[updated] อัปโหลดรูปภาพแล้ว",
                     userID,
@@ -335,6 +318,9 @@ upload_router.post('/upload_profile_pic', verifyToken, uploadImage.single('photo
     });
 });
 
+
+
+
 // Upload File
 upload_router.post('/upload_file', verifyToken, uploadFile.single('file'), (req, res) => {
     if (!req.file) {
@@ -360,6 +346,9 @@ upload_router.post('/upload_file', verifyToken, uploadFile.single('file'), (req,
     });
 });
 
+//? 
+//*
+//!
 // Error handler
 upload_router.use((err, req, res, next) => {
     if (err instanceof multer.MulterError) {
