@@ -376,51 +376,51 @@ user_data_router.post('/log_login', verifyToken, (req, res) => {
     });
 });
 
-user_data_router.get('/get_history_participate', verifyToken, (req, res) => {
-    const userId = req.user.userId;
-    const query = `
-        SELECT
-        c                               
-            d.id_customer, 
-            d.idcard_std, 
-            d.city, 
-            d.branch, 
-            b.name_th AS branch_name, 
-            d.date_regis
-        FROM (
-            SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2025_april_r1
-            UNION ALL
-            SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2025_april_r2
-            UNION ALL
-            SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2025_april_r3
-            UNION ALL
-            SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2025_april_r4
-            UNION ALL
-            SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2025_july_r1
-            UNION ALL
-            SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2025_july_r2
-            UNION ALL
-            SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2026_april_r1
-        ) AS d
-        LEFT JOIN branch AS b 
-        ON d.branch COLLATE utf8_unicode_ci = b.code_branch COLLATE utf8_unicode_ci
-        WHERE d.id_customer = ?
-        ORDER BY d.date_regis ASC;`;
+// user_data_router.get('/get_history_participate', verifyToken, (req, res) => {
+//     const userId = req.user.userId;
+//     const query = `
+//         SELECT
+//         c                               
+//             d.id_customer, 
+//             d.idcard_std, 
+//             d.city, 
+//             d.branch, 
+//             b.name_th AS branch_name, 
+//             d.date_regis
+//         FROM (
+//             SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2025_april_r1
+//             UNION ALL
+//             SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2025_april_r2
+//             UNION ALL
+//             SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2025_april_r3
+//             UNION ALL
+//             SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2025_april_r4
+//             UNION ALL
+//             SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2025_july_r1
+//             UNION ALL
+//             SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2025_july_r2
+//             UNION ALL
+//             SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2026_april_r2
+//         ) AS d
+//         LEFT JOIN branch AS b 
+//         ON d.branch COLLATE utf8_unicode_ci = b.code_branch COLLATE utf8_unicode_ci
+//         WHERE d.id_customer = ?
+//         ORDER BY d.date_regis ASC;`;
 
-    db_bewsie.query(query, [userId], (err, results) => {
-        if (err) {
-            return res.status(500).json({ message: err });
-        }
-        if (results.length === 0) {
+//     db_bewsie.query(query, [userId], (err, results) => {
+//         if (err) {
+//             return res.status(500).json({ message: err });
+//         }
+//         if (results.length === 0) {
 
-            return res.status(404).json({ message: "ไม่พบประวัติการเข้าร่วม" });
-        }
-        res.status(200).json({
-            message: 'Access granted',
-            data: results
-        });
-    });
-});
+//             return res.status(404).json({ message: "ไม่พบประวัติการเข้าร่วม" });
+//         }
+//         res.status(200).json({
+//             message: 'Access granted',
+//             data: results
+//         });
+//     });
+// });
 
 
 module.exports = user_data_router;

@@ -188,21 +188,22 @@ const verifyToken = require('../functions/auth');
 
 //! Path    
 const baseUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/uploads/${currentYear}/mod_customer`;
-const fileUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/file_BWG_April_R1_2026`;
+const fileUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/file_BWG_April_R2_2026`;
+
 
  
-const imageMimeTypes = [
-    'image/jpeg',
-    'image/png',
-    'image/gif',
-    'image/webp',
-    'image/jpg'
-];
+// const imageMimeTypes = [
+//     'image/jpeg',
+//     'image/png',
+//     'image/gif',
+//     'image/webp',
+//     'image/jpg'
+// ];
 
-const imageAndPdfMimeTypes = [
-    ...imageMimeTypes,
-    'application/pdf'
-];
+// const imageAndPdfMimeTypes = [
+//     ...imageMimeTypes,
+//     'application/pdf'
+// ];
 
 
 // Storage for profile image
@@ -327,7 +328,7 @@ upload_router.post('/upload_file', verifyToken, uploadFile.single('file'), (req,
         return res.status(400).json({ message: "ไม่ได้อัปโหลดไฟล์" });
     }
 
-    const filePath = `file_BWG_April_R1_2026/${req.file.filename}`;
+    const filePath = `file_BWG_April_R2_2026/${req.file.filename}`;
     const directory = path.dirname(filePath) + '/';
     const filename = path.basename(filePath);
 
