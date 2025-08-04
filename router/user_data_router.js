@@ -166,7 +166,8 @@ user_data_router.post('/login', (req, res) => {
                 userInfo: {
                     id: user.id_data_role,
                     name: user.forename,
-                    surename: user.surename
+                    surename: user.surename,
+                    statusEmail: user.status
                 },
                 token: token
             });
