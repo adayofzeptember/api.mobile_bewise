@@ -381,36 +381,48 @@ user_data_router.post('/log_login', verifyToken, (req, res) => {
 user_data_router.delete('/deleteUser', verifyToken, (req, res) => {
   const userId = req.user.userId;
 
-    db_TGAT.beginTransaction(err => {
-        if (err) {
-            return res.status(500).json({ success: false, message: "Transaction error" });
-        }
-        const deleteMod = "DELETE FROM mod_customer WHERE id_customer = ?";
-        const deleteUsers = "DELETE FROM users WHERE id_data_role = ?";
+  db_TGAT.beginTransaction(err => {
+    if (err) {
+      return res.status(500).json({ success: false, message: "Transaction error" });
+    }
 
-        db_TGAT.query(deleteUsers, [userId], (err, result1) => {
-            if (err) return db_TGAT.rollback(() => {
-                res.status(500).json({ success: false, message: "Error deleting registrations" });
-            });
+    const deleteMod = "DELETE FROM mod_customer WHERE id_customer = ?";
+    const deleteUsers = "DELETE FROM users WHERE id_data_role = ?";
 
-            db_TGAT.query(deleteMod, [userId], (err, result2) => {
-                if (err) return db_TGAT.rollback(() => {
-                    res.status(500).json({ success: false, message: "Error deleting user" });
-                });
-
-                db_TGAT.commit(err => {
-                    if (err) return db_TGAT.rollback(() => {
-                        res.status(500).json({ success: false, message: "Commit error" });
-                    });
-
-                    res.status(200).json({
-                        success: true,
-                        message: "ลบ user เรียบร้อยแล้ว"
-                    });
-                });
-            });
+    // ลบ mod_customer ก่อน
+    db_TGAT.query(deleteMod, [userId], (err, result1) => {
+      if (err) {
+        console.error("Error deleting mod_customer:", err);
+        return db_TGAT.rollback(() => {
+          res.status(500).json({ success: false, message: "Error deleting mod_customer" });
         });
+      }
+
+      // แล้วค่อยลบ users
+      db_TGAT.query(deleteUsers, [userId], (err, result2) => {
+        if (err) {
+          console.error("Error deleting users:", err);
+          return db_TGAT.rollback(() => {
+            res.status(500).json({ success: false, message: "Error deleting users" });
+          });
+        }
+
+        db_TGAT.commit(err => {
+          if (err) {
+            console.error("Commit error:", err);
+            return db_TGAT.rollback(() => {
+              res.status(500).json({ success: false, message: "Commit error" });
+            });
+          }
+
+          res.status(200).json({
+            success: true,
+            message: "ลบ user เรียบร้อยแล้ว"
+          });
+        });
+      });
     });
+  });
 });
 
 
