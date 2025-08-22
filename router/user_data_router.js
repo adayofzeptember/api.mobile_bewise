@@ -381,7 +381,7 @@ user_data_router.post('/log_login', verifyToken, (req, res) => {
 user_data_router.delete('/deleteUser', verifyToken, (req, res) => {
   const userId = req.user.userId;
 
-  db_TGAT.beginTransaction(err => {
+  db_bewsie.beginTransaction(err => {
     if (err) {
       return res.status(500).json({ success: false, message: "Transaction error" });
     }
@@ -390,27 +390,27 @@ user_data_router.delete('/deleteUser', verifyToken, (req, res) => {
     const deleteUsers = "DELETE FROM users WHERE id_data_role = ?";
 
     // ลบ mod_customer ก่อน
-    db_TGAT.query(deleteMod, [userId], (err, result1) => {
+    db_bewsie.query(deleteMod, [userId], (err, result1) => {
       if (err) {
         console.error("Error deleting mod_customer:", err);
-        return db_TGAT.rollback(() => {
+        return db_bewsie.rollback(() => {
           res.status(500).json({ success: false, message: "Error deleting mod_customer" });
         });
       }
 
       // แล้วค่อยลบ users
-      db_TGAT.query(deleteUsers, [userId], (err, result2) => {
+      db_bewsie.query(deleteUsers, [userId], (err, result2) => {
         if (err) {
           console.error("Error deleting users:", err);
-          return db_TGAT.rollback(() => {
+          return db_bewsie.rollback(() => {
             res.status(500).json({ success: false, message: "Error deleting users" });
           });
         }
 
-        db_TGAT.commit(err => {
+        db_bewsie.commit(err => {
           if (err) {
             console.error("Commit error:", err);
-            return db_TGAT.rollback(() => {
+            return db_bewsie.rollback(() => {
               res.status(500).json({ success: false, message: "Commit error" });
             });
           }
