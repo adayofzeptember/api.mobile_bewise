@@ -191,7 +191,7 @@ const baseUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/uploads/${curr
 const fileUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/file_BWG_April_R2_2026`;
 
 
- 
+
 // const imageMimeTypes = [
 //     'image/jpeg',
 //     'image/png',
@@ -204,8 +204,6 @@ const fileUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/file_BWG_April
 //     ...imageMimeTypes,
 //     'application/pdf'
 // ];
-
-
 // Storage for profile image
 const storageProfileImage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -250,7 +248,6 @@ upload_router.post('/upload_profile_pic', verifyToken, uploadImage.single('photo
     if (!req.file) {
         return res.status(400).json({ message: "ไม่ได้อัปโหลดไฟล์" });
     }
-
     const { format } = require('date-fns');
     const formattedDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
     const userID = req.user.userId;
@@ -265,7 +262,7 @@ upload_router.post('/upload_profile_pic', verifyToken, uploadImage.single('photo
             console.error('UPDATE ERROR --->', err.message);
             return res.status(500).json({ message: 'Internal Server Error' });
         }
-
+                                                                                                                                                                                                                                                                                                                                                                                             
         if (resCheck.length > 0) {
             const query_update_address = `
                 UPDATE user_images

@@ -377,6 +377,43 @@ user_data_router.post('/log_login', verifyToken, (req, res) => {
     });
 });
 
+//*
+user_data_router.delete('/deleteUser', verifyToken, (req, res) => {
+  const userId = req.user.userId;
+
+    db_TGAT.beginTransaction(err => {
+        if (err) {
+            return res.status(500).json({ success: false, message: "Transaction error" });
+        }
+        const deleteMod = "DELETE FROM mod_customer WHERE id_customer = ?";
+        const deleteUsers = "DELETE FROM users WHERE id_data_role = ?";
+
+        db_TGAT.query(deleteUsers, [userId], (err, result1) => {
+            if (err) return db_TGAT.rollback(() => {
+                res.status(500).json({ success: false, message: "Error deleting registrations" });
+            });
+
+            db_TGAT.query(deleteMod, [userId], (err, result2) => {
+                if (err) return db_TGAT.rollback(() => {
+                    res.status(500).json({ success: false, message: "Error deleting user" });
+                });
+
+                db_TGAT.commit(err => {
+                    if (err) return db_TGAT.rollback(() => {
+                        res.status(500).json({ success: false, message: "Commit error" });
+                    });
+
+                    res.status(200).json({
+                        success: true,
+                        message: "ลบ user เรียบร้อยแล้ว"
+                    });
+                });
+            });
+        });
+    });
+});
+
+
 // user_data_router.get('/get_history_participate', verifyToken, (req, res) => {
 //     const userId = req.user.userId;
 //     const query = `
