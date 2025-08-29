@@ -4,157 +4,161 @@ const register_exam_router = express.Router();
 const verifyToken = require('../functions/auth');
 const user_data_router = require('./user_data_router');
 
-// register_exam_router.post('/register', verifyToken, async (req, res) => {
-//     const { format, constructFrom } = require('date-fns');
-
-//     const formattedDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss'); // 🟢 Generate current timestamp
-//     const query_check = 'SELECT id_customer FROM dataregister_2026_april_r2 WHERE id_customer = ?';
-//     const { id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng, datanickname, datanickname_eng,
-//         dataage, gender, datanation, datatel, dataidline, dataemail, dataadd,
-//         districts, amphurs, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school, datalevel,
-//         dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, code_branch, databd, file_idcard, file_gpa } = req.body;
-
-//     db_bewsie.query(query_check, [id_customer], (err, results) => {
-//         if (err) {
-//             console.error('Error:', err);
-//             return res.status(500).json({ message: 'error', err });
-//         }
-//         if (results.length > 0) {
-//             return res.status(200).json({ message: 'เคยสมัครรอบนี้ไปแล้ว!' });
-//         }
-
-//         const query_exam_register = `INSERT INTO dataregister_2026_april_r2 (
-//         id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng, 
-//         datanickname, datanickname_eng, dataage, gender, datanation, datatel, dataidline, dataemail, dataadd, 
-//         districts, amphures, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school, datalevel, 
-//         dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, date_regis, branch, databd, file_idcard, file_gpa
-//         ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);`;
-
-//         db_bewsie.query(query_exam_register, [id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng,
-//             datanickname, datanickname_eng, dataage, gender, datanation, datatel, dataidline, dataemail, dataadd,
-//             districts, amphurs, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school, datalevel,
-//             dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, formattedDate, code_branch, databd, file_idcard, file_gpa], (err, results) => {
-//                 if (err) {
-//                     console.error('Error inserting register exam:', err);
-//                     return res.status(500).json({ message: 'error', err });
-//                 }
-//                 //! get ตรงนี้ แล้ว retuernid, branch ไว้ใว่ที่ id_cardSTD
-//                 const quey_getPayment = 'SELECT id, branch, city, id_customer FROM dataregister_2026_april_r2 WHERE id_customer = ?';
-//                 //!
-//                 db_bewsie.query(quey_getPayment, [id_customer], (err) => {
-//                     if (err) {
-//                         console.error('Error inserting register exam:', err);
-//                         return res.status(500).json({ message: 'error', err });
-//                     }
-//                     const query_update_idcard_tomod = `
-//                             UPDATE mod_customer 
-//                                 SET 
-//                                 id_card = ?    
-//                             WHERE id_customer = ?`;
-
-//                     db_bewsie.query(query_update_idcard_tomod, [id_customer, idcard], (err, resultsGet) => {
-//                         if (err) {
-//                             console.error('Error inserting register exam:', err);
-//                             return res.status(500).json({ message: 'error', err });
-//                         }
-
-
-//                         const formattedResult = {
-//                             ...resultsGet[0],
-//                             id: String(resultsGet[0].id).padStart(4, '0') // Ensures id has 4 digits
-//                         };
-
-//                         return res.status(201).json({
-//                             message: 'สมัครสอบสำเร็จ',
-//                             data:
-//                                 formattedResult
-//                         });
-
-//                     });
-
-
-    
-
-//                 });
-//                 //!
-
-
-//             });
-//     });
-// });
-
 register_exam_router.post('/register', verifyToken, async (req, res) => {
-    const { format } = require('date-fns');
-    const formattedDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+    const { format, constructFrom } = require('date-fns');
 
-    const {
-        id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng,
-        datanickname, datanickname_eng, dataage, gender, datanation, datatel, dataidline, dataemail, dataadd,
-        districts, amphurs, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school, datalevel,
-        dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, code_branch, databd,
-        file_idcard, file_gpa
-    } = req.body;
-
+    const formattedDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss'); // 🟢 Generate current timestamp
     const query_check = 'SELECT id_customer FROM dataregister_2026_april_r2 WHERE id_customer = ?';
+    const { id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng, datanickname, datanickname_eng,
+        dataage, gender, datanation, datatel, dataidline, dataemail, dataadd,
+        districts, amphurs, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school, datalevel,
+        dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, code_branch, databd, file_idcard, file_gpa } = req.body;
 
     db_bewsie.query(query_check, [id_customer], (err, results) => {
-        if (err) return res.status(500).json({ message: 'DB error', err });
-
+        if (err) {
+            console.error('Error:', err);
+            return res.status(500).json({ message: 'error', err });
+        }
         if (results.length > 0) {
             return res.status(200).json({ message: 'เคยสมัครรอบนี้ไปแล้ว!' });
         }
 
-        // insert new register
-        const query_exam_register = `
-            INSERT INTO dataregister_2026_april_r2 (
-                id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng,
-                datanickname, datanickname_eng, dataage, gender, datanation, datatel, dataidline, dataemail, dataadd,
-                districts, amphurs, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school, datalevel,
-                dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, date_regis, branch,
-                databd, file_idcard, file_gpa
-            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
-        `;
+        const query_exam_register = `INSERT INTO dataregister_2026_april_r2 (
+        id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng, 
+        datanickname, datanickname_eng, dataage, gender, datanation, datatel, dataidline, dataemail, dataadd, 
+        districts, amphures, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school, datalevel, 
+        dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, date_regis, branch, databd, file_idcard, file_gpa
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);`;
 
-        db_bewsie.query(query_exam_register, [
-            id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng,
+        db_bewsie.query(query_exam_register, [id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng,
             datanickname, datanickname_eng, dataage, gender, datanation, datatel, dataidline, dataemail, dataadd,
             districts, amphurs, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school, datalevel,
-            dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, formattedDate, code_branch,
-            databd, file_idcard, file_gpa
-        ], (err) => {
-            if (err) return res.status(500).json({ message: 'Insert error', err });
-
-            // get data back
-            const query_get = 'SELECT id, branch, city, id_customer FROM dataregister_2026_april_r2 WHERE id_customer = ?';
-            db_bewsie.query(query_get, [id_customer], (err, rows) => {
-                if (err) return res.status(500).json({ message: 'Select error', err });
-
-                if (rows.length === 0) {
-                    return res.status(500).json({ message: 'ไม่พบข้อมูลที่เพิ่ง insert' });
+            dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, formattedDate, code_branch, databd, file_idcard, file_gpa], (err, results) => {
+                if (err) {
+                    console.error('Error inserting register exam:', err);
+                    return res.status(500).json({ message: 'error', err });
                 }
+                //! get ตรงนี้ แล้ว retuernid, branch ไว้ใว่ที่ id_cardSTD
+                const quey_getPayment = 'SELECT id, branch, city, id_customer FROM dataregister_2026_april_r2 WHERE id_customer = ?';
+                //!
+                db_bewsie.query(quey_getPayment, [id_customer], (err, resultsGet) => {
+                    if (err) {
+                        console.error('Error inserting register exam:', err);
+                        return res.status(500).json({ message: 'error', err });
+                    }
 
-                const regisData = rows[0];
 
-                // update mod_customer (ใช้ idcard ไม่ใช่ id_customer)
-                const query_update_mod = `UPDATE mod_customer SET id_card = ? WHERE id_customer = ?`;
-                db_bewsie.query(query_update_mod, [idcard, id_customer], (err) => {
-                    if (err) return res.status(500).json({ message: 'Update mod_customer error', err });
-
-                    // format id ให้มี 4 หลัก
                     const formattedResult = {
-                        ...regisData,
-                        id: String(regisData.id).padStart(4, '0')
+                        ...resultsGet[0],
+                        id: String(resultsGet[0].id).padStart(4, '0') // Ensures id has 4 digits
                     };
 
-                    return res.status(201).json({
-                        message: 'สมัครสอบสำเร็จ',
-                        data: formattedResult
+
+                    const query_update_idcard_tomod = `
+                            UPDATE mod_customer 
+                                SET 
+                                id_card = ?    
+                            WHERE id_customer = ?`;
+
+                    db_bewsie.query(query_update_idcard_tomod, [idcard, id_customer], (err) => {
+                        if (err) {
+                            console.error('Error inserting register exam:', err);
+                            return res.status(500).json({ message: 'error', err });
+                        }
+
+
+
+                        return res.status(201).json({
+                            message: 'สมัครสอบสำเร็จ',
+                            data:
+                                formattedResult
+                        });
+
                     });
+
+
+
+
                 });
+                //!
+
+
             });
-        });
     });
 });
+
+// register_exam_router.post('/register', verifyToken, async (req, res) => {
+//     const { format } = require('date-fns');
+//     const formattedDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+
+//     const {
+//         id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng,
+//         datanickname, datanickname_eng, dataage, gender, datanation, datatel, dataidline, dataemail, dataadd,
+//         districts, amphurs, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school, datalevel,
+//         dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, code_branch, databd,
+//         file_idcard, file_gpa
+//     } = req.body;
+
+//     const query_check = 'SELECT id_customer FROM dataregister_2026_april_r2 WHERE id_customer = ?';
+
+//     db_bewsie.query(query_check, [id_customer], (err, results) => {
+//         if (err) return res.status(500).json({ message: 'DB error', err });
+
+//         if (results.length > 0) {
+//             return res.status(200).json({ message: 'เคยสมัครรอบนี้ไปแล้ว!' });
+//         }
+
+//         // insert new register
+//         const query_exam_register = `
+//             INSERT INTO dataregister_2026_april_r2 (
+//                 id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng,
+//                 datanickname, datanickname_eng, dataage, gender, datanation, datatel, dataidline, dataemail, dataadd,
+//                 districts, amphurs, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school, datalevel,
+//                 dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, date_regis, branch,
+//                 databd, file_idcard, file_gpa
+//             ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+//         `;
+
+//         db_bewsie.query(query_exam_register, [
+//             id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng,
+//             datanickname, datanickname_eng, dataage, gender, datanation, datatel, dataidline, dataemail, dataadd,
+//             districts, amphurs, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school, datalevel,
+//             dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, formattedDate, code_branch,
+//             databd, file_idcard, file_gpa
+//         ], (err) => {
+//             if (err) return res.status(500).json({ message: 'Insert error', err });
+
+//             // get data back
+//             const query_get = 'SELECT id, branch, city, id_customer FROM dataregister_2026_april_r2 WHERE id_customer = ?';
+//             db_bewsie.query(query_get, [id_customer], (err, rows) => {
+//                 if (err) return res.status(500).json({ message: 'Select error', err });
+
+//                 if (rows.length === 0) {
+//                     return res.status(500).json({ message: 'ไม่พบข้อมูลที่เพิ่ง insert' });
+//                 }
+
+//                 const regisData = rows[0];
+
+//                 // update mod_customer (ใช้ idcard ไม่ใช่ id_customer)
+//                 const query_update_mod = `UPDATE mod_customer SET id_card = ? WHERE id_customer = ?`;
+//                 db_bewsie.query(query_update_mod, [idcard, id_customer], (err) => {
+//                     if (err) return res.status(500).json({ message: 'Update mod_customer error', err });
+
+//                     // format id ให้มี 4 หลัก
+//                     const formattedResult = {
+//                         ...regisData,
+//                         id: String(regisData.id).padStart(4, '0')
+//                     };
+
+//                     return res.status(201).json({
+//                         message: 'สมัครสอบสำเร็จ',
+//                         data: formattedResult
+//                     });
+//                 });
+//             });
+//         });
+//     });
+// });
 
 
 register_exam_router.put('/update_afterslip', verifyToken, (req, res) => {
