@@ -527,6 +527,33 @@ register_exam_router.put('/update_idcard_afterRegis', verifyToken, (req, res) =>
 
 // });
 
+// register_exam_router.post('/favorite', verifyToken, (req, res) => {
+//     const userId = req.user.userId;
+//     const { fav } = req.body;
+
+//     if (!fav) {
+//         return res.status(400).json({ message: 'กรุณาส่ง favorite_name' });
+//     }
+
+//     const query = `
+//         INSERT INTO favorite (id_customer, favorite_name)
+//         VALUES (?, ?);
+//     `;
+
+//     db_bewsie.query(query, [userId, fav], (err, results) => {
+//         if (err) {
+//             console.error('Error inserting favorite:', err);
+//             return res.status(500).json({ message: 'เกิดข้อผิดพลาด', err });
+//         }
+
+//         if (results.affectedRows > 0) {
+//             return res.status(200).json({ message: 'เพิ่มรายการโปรดแล้ว' });
+//         } else {
+//             return res.status(500).json({ message: 'ไม่สามารถเพิ่มรายการโปรดได้' });
+//         }
+//     });
+// });
+
 register_exam_router.post('/favorite', verifyToken, (req, res) => {
     const userId = req.user.userId;
     const { fav } = req.body;
@@ -535,22 +562,38 @@ register_exam_router.post('/favorite', verifyToken, (req, res) => {
         return res.status(400).json({ message: 'กรุณาส่ง favorite_name' });
     }
 
-    const query = `
-        INSERT INTO favorite (id_customer, favorite_name)
-        VALUES (?, ?);
+    // ตรวจสอบว่ามีอยู่แล้วหรือไม่
+    const checkQuery = `
+        SELECT * FROM favorite
+        WHERE id_customer = ? AND favorite_name = ?;
     `;
 
-    db_bewsie.query(query, [userId, fav], (err, results) => {
+    db_bewsie.query(checkQuery, [userId, fav], (err, results) => {
         if (err) {
-            console.error('Error inserting favorite:', err);
+            console.error('Error checking favorite:', err);
             return res.status(500).json({ message: 'เกิดข้อผิดพลาด', err });
         }
 
-        if (results.affectedRows > 0) {
-            return res.status(200).json({ message: 'เพิ่มรายการโปรดแล้ว' });
-        } else {
-            return res.status(500).json({ message: 'ไม่สามารถเพิ่มรายการโปรดได้' });
+        if (results.length > 0) {
+            // พบแล้ว → ไม่เพิ่มซ้ำ
+            return res.status(409).json({ message: 'รายการโปรดนี้มีอยู่แล้ว' });
         }
+
+        // ยังไม่มี → ทำการ insert
+        const insertQuery = `
+            INSERT INTO favorite (id_customer, favorite_name)
+            VALUES (?, ?);
+        `;
+
+        db_bewsie.query(insertQuery, [userId, fav], (err2, results2) => {
+            if (err2) {
+                console.error('Error inserting favorite:', err2);
+                return res.status(500).json({ message: 'เกิดข้อผิดพลาด', err: err2 });
+            }
+
+            return res.status(200).json({ message: 'เพิ่มรายการโปรดแล้ว' });
+        });
     });
 });
+
 module.exports = register_exam_router;
