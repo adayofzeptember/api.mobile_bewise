@@ -502,4 +502,55 @@ register_exam_router.put('/update_idcard_afterRegis', verifyToken, (req, res) =>
     });
 });
 
+
+
+
+// register_exam_router.post('/favorite', verifyToken, (req, res) => {
+//     //! insert ลง table การชำระเงิน
+
+//     const userId = req.user.userId;
+//     const { fav } = req.body;
+//         const query_exam_register = `INSERT INTO favorite (
+//             id_customer, favorite_name) VALUES (?,?);`;
+
+
+//     db_bewsie.query(query_exam_register, [userId, fav ], (err, results2) => {
+//         if (err) {
+//             console.error('Error inserting register exam:', err);
+//             return res.status(500).json({ message: 'error', err });
+//         }
+//         res.status(200).json({
+//             message: 'เพิ่มรายการโปรดแล้ว'
+//         });
+//         //!
+//     });
+
+// });
+
+register_exam_router.post('/favorite', verifyToken, (req, res) => {
+    const userId = req.user.userId;
+    const { fav } = req.body;
+
+    if (!fav) {
+        return res.status(400).json({ message: 'กรุณาส่ง favorite_name' });
+    }
+
+    const query = `
+        INSERT INTO favorite (id_customer, favorite_name)
+        VALUES (?, ?);
+    `;
+
+    db_bewsie.query(query, [userId, fav], (err, results) => {
+        if (err) {
+            console.error('Error inserting favorite:', err);
+            return res.status(500).json({ message: 'เกิดข้อผิดพลาด', err });
+        }
+
+        if (results.affectedRows > 0) {
+            return res.status(200).json({ message: 'เพิ่มรายการโปรดแล้ว' });
+        } else {
+            return res.status(500).json({ message: 'ไม่สามารถเพิ่มรายการโปรดได้' });
+        }
+    });
+});
 module.exports = register_exam_router;
