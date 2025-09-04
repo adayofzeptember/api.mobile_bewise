@@ -598,12 +598,12 @@ register_exam_router.post('/favorite', verifyToken, (req, res) => {
 
 
 
-
 register_exam_router.get('/favorite', verifyToken, (req, res) => {
     const userId = req.user.userId;
 
     const query = `
-        SELECT favorite_name FROM favorite
+        SELECT id, favorite_name 
+        FROM favorite
         WHERE id_customer = ?;
     `;
 
@@ -614,8 +614,11 @@ register_exam_router.get('/favorite', verifyToken, (req, res) => {
         }
 
         return res.status(200).json({
-            message: 'ดึงรายการโปรดสำเร็จ',
-            favorites: results, // ส่งข้อมูล favorite ของ user
+            message: 'success',
+            favorites: results.map(row => ({
+                id: row.id,
+                favorite_name: row.favorite_name
+            }))
         });
     });
 });
