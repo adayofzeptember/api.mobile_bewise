@@ -623,6 +623,31 @@ register_exam_router.get('/favorite', verifyToken, (req, res) => {
     });
 });
 
+register_exam_router.delete('/favorite/:id', verifyToken, (req, res) => {
+    const userId = req.user.userId;
+    const favoriteId = req.params.id;
+
+    const query = `
+        DELETE FROM favorite 
+        WHERE id = ? AND id_customer = ?;
+    `;
+
+    db_bewsie.query(query, [favoriteId, userId], (err, results) => {
+        if (err) {
+            console.error('Error deleting favorite:', err);
+            return res.status(500).json({ success: false, message: 'เกิดข้อผิดพลาด' });
+        }
+
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'ไม่พบข้อมูลที่จะลบ' });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'ลบรายการโปรดเรียบร้อยแล้ว'
+        });
+    });
+});
 
 
 module.exports = register_exam_router;
