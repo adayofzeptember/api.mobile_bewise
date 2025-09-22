@@ -5,6 +5,7 @@ const upload_router = require('./router/upload_router');
 const user_data_router = require('./router/user_data_router');
 const register_exam_router = require('./router/register_exam');
 const path = require('path');
+const log_error = require('./functions/log_error');
 const { constants } = require('module');
 // หลัก 
 dotenv.config();
@@ -23,28 +24,24 @@ app.use('/uploads', express.static('/newdata/vhosts/bewise-global.com/httpdocs/u
 
 // ✅ Error handler สำหรับ route
 app.use((err, req, res, next) => {
-  console.error("❌ Error caught:", err.stack || err);
+  log_error.error(`🔥 API Error: ${err.stack || err}`);
   res.status(500).json({
     success: false,
-    message: "มีข้อผิดพลาดภายในเซิร์ฟเวอร์",
+    message: "Server error, please try again later."
   });
 });
 
 // ✅ จับ error ที่ Express handle ไม่ได้
 process.on("uncaughtException", (err) => {
-  console.error("🔥 Uncaught Exception:", err);
+  log_error.error("🔥 Uncaught Exception:", err);
   // แค่ log เอาไว้ก่อน ยังให้ server รันต่อ
 });
 
 process.on("unhandledRejection", (reason, promise) => {
-  console.error("🔥 Unhandled Rejection at:", promise, "reason:", reason);
+  log_error.error("🔥 Unhandled Rejection at:", promise, "reason:", reason);
   // ป้องกันไม่ให้ process crash
 });
 
 app.listen(onPort, () => {
   console.log('🚀 Server is running on port ' + onPort);
 });
-
-// dataregister_2026_april_r3
-// datapayment_2026_april_r3
-// file_BWG_April_R3_2026
