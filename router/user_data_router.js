@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const randomString = require('../functions/random_string');
 const verifyToken = require('../functions/auth');
+const { format } = require('date-fns');
 
 //!
 user_data_router.get('/get_branch', (req, res) => {
@@ -80,7 +81,7 @@ user_data_router.post('/register', async (req, res) => {
     db_bewsie.query(query_check_dup, [email], (err2, resCheckDup) => {
         if (err2) {
             console.error('Database query error:', err2);
-            return;
+            return; ำ
         }
         if (resCheckDup.length > 0) {
 
@@ -145,7 +146,7 @@ user_data_router.post('/login', (req, res) => {
             console.error('Database error:', err);
             return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' });
         }
-        if (err || results.length === 0) {
+        if (results.length === 0) {
             return res.status(401).json({ message: 'ไม่พบบัญชี' });
         }
         const user = results[0];
@@ -154,7 +155,7 @@ user_data_router.post('/login', (req, res) => {
                 return res.status(401).json({ message: 'รหัสผ่านไม่ถูกต้อง' });
             }
 
-            
+
             //! Generate Token (Only Store userId)  userId จาก JWT ไว้เรียกใช้
             const token = jwt.sign(
                 { userId: user.id_data_role }, // Only storing user ID
@@ -379,50 +380,50 @@ user_data_router.post('/log_login', verifyToken, (req, res) => {
 
 //*
 user_data_router.delete('/deleteUser', verifyToken, (req, res) => {
-  const userId = req.user.userId;
+    const userId = req.user.userId;
 
-  db_bewsie.beginTransaction(err => {
-    if (err) {
-      return res.status(500).json({ success: false, message: "Transaction error" });
-    }
-
-    const deleteMod = "DELETE FROM mod_customer WHERE id_customer = ?";
-    const deleteUsers = "DELETE FROM users WHERE id_data_role = ?";
-
-    // ลบ mod_customer ก่อน
-    db_bewsie.query(deleteMod, [userId], (err, result1) => {
-      if (err) {
-        console.error("Error deleting mod_customer:", err);
-        return db_bewsie.rollback(() => {
-          res.status(500).json({ success: false, message: "Error deleting mod_customer" });
-        });
-      }
-
-      // แล้วค่อยลบ users
-      db_bewsie.query(deleteUsers, [userId], (err, result2) => {
+    db_bewsie.beginTransaction(err => {
         if (err) {
-          console.error("Error deleting users:", err);
-          return db_bewsie.rollback(() => {
-            res.status(500).json({ success: false, message: "Error deleting users" });
-          });
+            return res.status(500).json({ success: false, message: "Transaction error" });
         }
 
-        db_bewsie.commit(err => {
-          if (err) {
-            console.error("Commit error:", err);
-            return db_bewsie.rollback(() => {
-              res.status(500).json({ success: false, message: "Commit error" });
-            });
-          }
+        const deleteMod = "DELETE FROM mod_customer WHERE id_customer = ?";
+        const deleteUsers = "DELETE FROM users WHERE id_data_role = ?";
 
-          res.status(200).json({
-            success: true,
-            message: "ลบ user เรียบร้อยแล้ว"
-          });
+        // ลบ mod_customer ก่อน
+        db_bewsie.query(deleteMod, [userId], (err, result1) => {
+            if (err) {
+                console.error("Error deleting mod_customer:", err);
+                return db_bewsie.rollback(() => {
+                    res.status(500).json({ success: false, message: "Error deleting mod_customer" });
+                });
+            }
+
+            // แล้วค่อยลบ users
+            db_bewsie.query(deleteUsers, [userId], (err, result2) => {
+                if (err) {
+                    console.error("Error deleting users:", err);
+                    return db_bewsie.rollback(() => {
+                        res.status(500).json({ success: false, message: "Error deleting users" });
+                    });
+                }
+
+                db_bewsie.commit(err => {
+                    if (err) {
+                        console.error("Commit error:", err);
+                        return db_bewsie.rollback(() => {
+                            res.status(500).json({ success: false, message: "Commit error" });
+                        });
+                    }
+
+                    res.status(200).json({
+                        success: true,
+                        message: "ลบ user เรียบร้อยแล้ว"
+                    });
+                });
+            });
         });
-      });
     });
-  });
 });
 
 
@@ -471,6 +472,85 @@ user_data_router.delete('/deleteUser', verifyToken, (req, res) => {
 //         });
 //     });
 // });
+
+
+
+user_data_router.post('/loginsocial', (req, res) => {
+
+    const { social_email, social_name, social_pic, soical_id } = req.body;
+
+    const query_check_dup = 'SELECT user_email FROM users WHERE user_email = ?';
+
+    db_bewsie.query(query_check_dup, [social_email], (err, results) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' });
+        }
+        if (results.length > 0) {
+            // ล็อคอิน 
+            return res.status(200).json({ message: 'มีบัญชีอยู่แล้ว' });
+        }
+        //! regisใหม่ 
+        const idrole = "od5e82971a2482d58br6369121200f54a4l";
+        const random_for_id_user = randomString(35);
+        const random_for_id_data_role = randomString(35);
+        const formattedDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+        const insert_users = `INSERT INTO users 
+            (id_user, user_name, user_password, user_email, id_role, create_datetime, id_data_role, update_datetime) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+
+        // users
+        db_bewsie.query(insert_users, [random_for_id_user, social_email, 'social_login', social_email, idrole, formattedDate, random_for_id_data_role, formattedDate], (err, results) => {
+            if (err) {
+                console.error('Error inserting into users: ', err);
+                return res.status(500).json({ message: 'ไม่สามารถ register social *users', err });
+            }
+            // mod
+            const insert_mod_customer = `INSERT INTO mod_customer
+                (id_customer, forename, surename, user_email, create_id, create_datetime) 
+                VALUES (?, ?, ?, ?, ?, ?)`;
+            db_bewsie.query(insert_mod_customer, [random_for_id_data_role, social_name, ' ', social_email, random_for_id_data_role, formattedDate], (err, results) => {
+                if (err) {
+                    console.error('Error inserting into mod_customer :', err);
+                    return res.status(500).json({ message: 'ไม่สามารถ register social *modcustomer', err });
+
+                }
+
+                //รุป
+                const insert_image = `INSERT INTO user_images (id_user, name, date, type)
+                VALUES(?, ?, ?, ?)`;
+
+                db_bewsie.query(insert_image, [random_for_id_data_role, social_pic, formattedDate, 1], (err, results) => {
+                    if (err) {
+                        console.error('Error inserting into mod_customer :', err);
+                        return res.status(500).json({ message: 'ไม่สามารถ register social *images', err });
+
+                    }
+
+                    return res.status(201).json({
+                        message: 'สมัครสมาชิกผ่าน social เรียบร้อย',
+                        data: {
+                            id: random_for_id_data_role,
+                            name: social_name,
+                            email: social_email,
+                            create_datetime: formattedDate,
+                        }
+                    });
+                });
+
+
+            });
+
+
+        });
+    });
+
+
+    // return res.status(200).json({ message: 'ไม่พบบัญชี' });
+
+
+});
+
 
 
 module.exports = user_data_router;

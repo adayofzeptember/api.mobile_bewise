@@ -1,0 +1,50 @@
+[2025-09-26T02:40:06.420Z] ERROR: 🔥 Uncaught Exception:
+[2025-09-26T02:40:18.750Z] ERROR: 🔥 Uncaught Exception:
+[2025-09-26T02:40:28.719Z] ERROR: 🔥 Uncaught Exception:
+[2025-09-26T02:40:30.021Z] ERROR: 🔥 Uncaught Exception:
+[2025-09-26T02:40:31.908Z] ERROR: 🔥 Uncaught Exception:
+[2025-09-26T02:41:09.235Z] ERROR: 🔥 Uncaught Exception:
+[2025-09-26T02:41:13.382Z] ERROR: 🔥 Uncaught Exception:
+[2025-09-26T02:41:23.156Z] ERROR: 🔥 Uncaught Exception:
+[2025-09-26T02:41:25.992Z] ERROR: 🔥 Uncaught Exception:
+[2025-09-26T02:41:54.658Z] ERROR: 🔥 Uncaught Exception:
+[2025-09-26T02:41:55.769Z] ERROR: 🔥 Uncaught Exception:
+[2025-09-26T02:43:50.681Z] ERROR: 🔥 Uncaught Exception:
+[2025-09-30T08:30:39.866Z] ERROR: 🔥 API Error: SyntaxError: Expected double-quoted property name in JSON at position 39 (line 3 column 1)
+    at JSON.parse (<anonymous>)
+    at parse (/Users/bewisetec/dev_bewise/api.mobile_bewise/node_modules/body-parser/lib/types/json.js:92:19)
+    at /Users/bewisetec/dev_bewise/api.mobile_bewise/node_modules/body-parser/lib/read.js:128:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)
+    at invokeCallback (/Users/bewisetec/dev_bewise/api.mobile_bewise/node_modules/raw-body/index.js:238:16)
+    at done (/Users/bewisetec/dev_bewise/api.mobile_bewise/node_modules/raw-body/index.js:227:7)
+    at IncomingMessage.onEnd (/Users/bewisetec/dev_bewise/api.mobile_bewise/node_modules/raw-body/index.js:287:7)
+    at IncomingMessage.emit (node:events:519:28)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+[2025-09-30T08:30:40.922Z] ERROR: 🔥 API Error: SyntaxError: Expected double-quoted property name in JSON at position 39 (line 3 column 1)
+    at JSON.parse (<anonymous>)
+    at parse (/Users/bewisetec/dev_bewise/api.mobile_bewise/node_modules/body-parser/lib/types/json.js:92:19)
+    at /Users/bewisetec/dev_bewise/api.mobile_bewise/node_modules/body-parser/lib/read.js:128:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)
+    at invokeCallback (/Users/bewisetec/dev_bewise/api.mobile_bewise/node_modules/raw-body/index.js:238:16)
+    at done (/Users/bewisetec/dev_bewise/api.mobile_bewise/node_modules/raw-body/index.js:227:7)
+    at IncomingMessage.onEnd (/Users/bewisetec/dev_bewise/api.mobile_bewise/node_modules/raw-body/index.js:287:7)
+    at IncomingMessage.emit (node:events:519:28)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+[2025-09-30T08:30:59.774Z] ERROR: 🔥 API Error: SyntaxError: Expected double-quoted property name in JSON at position 39 (line 3 column 1)
+    at JSON.parse (<anonymous>)
+    at parse (/Users/bewisetec/dev_bewise/api.mobile_bewise/node_modules/body-parser/lib/types/json.js:92:19)
+    at /Users/bewisetec/dev_bewise/api.mobile_bewise/node_modules/body-parser/lib/read.js:128:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)
+    at invokeCallback (/Users/bewisetec/dev_bewise/api.mobile_bewise/node_modules/raw-body/index.js:238:16)
+    at done (/Users/bewisetec/dev_bewise/api.mobile_bewise/node_modules/raw-body/index.js:227:7)
+    at IncomingMessage.onEnd (/Users/bewisetec/dev_bewise/api.mobile_bewise/node_modules/raw-body/index.js:287:7)
+    at IncomingMessage.emit (node:events:519:28)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+[2025-09-30T09:32:08.652Z] ERROR: 🔥 Uncaught Exception:
+[2025-09-30T09:38:38.014Z] ERROR: 🔥 Uncaught Exception:
+[2025-09-30T09:39:46.070Z] ERROR: 🔥 Uncaught Exception:
+[2025-09-30T09:39:50.150Z] ERROR: 🔥 Uncaught Exception:
+[2025-09-30T09:40:03.141Z] ERROR: 🔥 Uncaught Exception:
