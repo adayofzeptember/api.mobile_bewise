@@ -141,6 +141,8 @@ user_data_router.post('/login', (req, res) => {
         JOIN mod_customer ON users.id_data_role = mod_customer.id_customer 
         WHERE user_name = ?`;
 
+
+
     db_bewsie.query(query, [user_name], (err, results) => {
         if (err) {
             console.error('Database error:', err);
@@ -494,11 +496,14 @@ user_data_router.post('/loginsocial', (req, res) => {
         }
         if (results.length > 0) {
             console.log('login');
-            const login_social = `
-            SELECT *
-            FROM mod_customer WHERE user_email = ?`;
+            // const login_social = `
+            // SELECT *
+            // FROM mod_customer WHERE user_email = ?`;
 
-
+            const login_social = `SELECT users.*, mod_customer.* 
+        FROM users 
+        JOIN mod_customer ON users.id_data_role = mod_customer.id_customer 
+        WHERE user_name = ?`;
             db_bewsie.query(login_social, [social_email], (err, resultLogin) => {
                 if (err) {
                     console.error('Error login social : ', err);
@@ -510,7 +515,7 @@ user_data_router.post('/loginsocial', (req, res) => {
 
 
                 const token = jwt.sign(
-                    { userId: user.id_customer },
+                    { userId: user.id_data_role },
                     process.env.JWT_SECRET,
                     { expiresIn: '365d' }
                 );
@@ -521,7 +526,9 @@ user_data_router.post('/loginsocial', (req, res) => {
                 return res.status(200).json({
                     message: 'เข้าสู่ระบบเสร็จสิ้น',
                     userInfo: {
-                        id: user.id_customer,
+                        id: user.id_data_role,
+                        name: user.forename,
+                        // id: user.id_customer,
                         // name: user.forename,
                         // statusEmail: user.status
                     },
