@@ -245,76 +245,6 @@ user_data_router.get('/get_profile', verifyToken, (req, res) => {
 });
 
 
-// user_data_router.get('/get_profile', verifyToken, (req, res) => {
-//     const userId = req.user.userId;
-
-//     const get_profile_query = `
-//   SELECT 
-//     users.user_email, 
-//     users.create_datetime,
-
-//     mod_customer.forename, 
-//     mod_customer.surename, 
-//     mod_customer.id_card,
-
-
-//     user_address.address,
-//     user_address.district, 
-//     user_address.postcode,
-//     user_address.province,
-//     user_address.amphur,
-//     user_address.telephone,
-
-//     user_images.name AS img_name,
-//     user_images.directory AS img_directory
-
-//   FROM users 
-//   LEFT JOIN mod_customer ON users.id_data_role = mod_customer.id_customer
-//   LEFT JOIN user_images ON users.id_data_role = user_images.id_user 
-//   LEFT JOIN user_address ON users.id_data_role = user_address.id_user 
-
-//   WHERE users.id_user = ? OR users.id_data_role = ?
-//   LIMIT 1
-// `;
-
-//     db_bewsie.query(get_profile_query, [userId, userId], (err, results) => {
-//         if (err) {
-//             console.error('DB error get_profile:', err);
-//             return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' });
-//         }
-
-//         if (!results || results.length === 0) {
-//             return res.status(404).json({ message: 'User not found' });
-//         }
-
-//         const user = results[0];
-
-//         res.status(200).json({
-//             message: 'Access granted',
-//             data: {
-//                 user: {
-//                     id_customer: user.id_customer || null,
-//                     email: user.user_email || "",
-//                     create_datetime: user.create_datetime || "",
-//                     forename: user.forename || "",
-//                     surename: user.surename || "",
-//                     id_card: user.id_card || "",
-//                     pic: {
-//                         name: user.img_name || "no-pic",
-//                         directory: user.img_directory || ""
-//                     },
-//                     address: user.address || "",
-//                     district: user.district || "",
-//                     postcode: user.postcode || "",
-//                     province: user.province || "",
-//                     amphur: user.amphur || "",
-//                     telephone: user.telephone || ""
-//                 }
-//             }
-//         });
-//     });
-// });
-
 
 
 user_data_router.put('/update_user/:id', verifyToken, (req, res) => {
@@ -564,21 +494,9 @@ user_data_router.post('/loginsocial', (req, res) => {
         }
         if (results.length > 0) {
             console.log('login');
-
-
-            //* ล็อคอิน 
             const login_social = `
-            SELECT users.*, mod_customer.* 
-            FROM users 
-            JOIN mod_customer ON users.id_data_role = mod_customer.id_customer 
-            WHERE user_name = ?`;
-
-
-
-
-            //     const login_social = `
-            // SELECT *
-            // FROM mod_customer WHERE user_email = ?`;
+            SELECT *
+            FROM mod_customer WHERE user_email = ?`;
 
 
             db_bewsie.query(login_social, [social_email], (err, resultLogin) => {
@@ -591,10 +509,8 @@ user_data_router.post('/loginsocial', (req, res) => {
                 console.log(user);
 
 
-
-
                 const token = jwt.sign(
-                    { userId: user.id_data_role },
+                    { userId: user.id_customer },
                     process.env.JWT_SECRET,
                     { expiresIn: '365d' }
                 );
@@ -605,7 +521,7 @@ user_data_router.post('/loginsocial', (req, res) => {
                 return res.status(200).json({
                     message: 'เข้าสู่ระบบเสร็จสิ้น',
                     userInfo: {
-                        id: user.id_data_role,
+                        id: user.id_customer,
                         // name: user.forename,
                         // statusEmail: user.status
                     },
@@ -625,24 +541,24 @@ user_data_router.post('/loginsocial', (req, res) => {
         const random_for_id_data_role = randomString(35);
         const formattedDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
         const insert_users = `INSERT INTO users 
-            (id_user, user_name, user_password, user_email, id_role, create_datetime, id_data_role, update_datetime) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+            (id_user, user_name, user_password, user_email, id_role, create_datetime, id_data_role, update_datetime, status) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         const token = jwt.sign(
             { userId: random_for_id_data_role },
             process.env.JWT_SECRET,
             { expiresIn: '365d' }
         );
         // users
-        db_bewsie.query(insert_users, [random_for_id_user, social_email, 'social_login', social_email, idrole, formattedDate, random_for_id_data_role, formattedDate], (err, results) => {
+        db_bewsie.query(insert_users, [random_for_id_user, social_email, 'social_login', social_email, idrole, formattedDate, random_for_id_data_role, formattedDate, 1], (err, results) => {
             if (err) {
                 console.error('Error inserting into users: ', err);
                 return res.status(500).json({ message: 'ไม่สามารถ register social *users', err });
             }
             // mod
             const insert_mod_customer = `INSERT INTO mod_customer
-                (id_customer, forename, surename, user_email, create_id, create_datetime) 
-                VALUES (?, ?, ?, ?, ?, ?)`;
-            db_bewsie.query(insert_mod_customer, [random_for_id_data_role, social_name, ' ', social_email, random_for_id_data_role, formattedDate], (err, results) => {
+                (id_customer, forename, surename, forename_socail_late, user_email, create_id, create_datetime, user_email_verify, id_google) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            db_bewsie.query(insert_mod_customer, [random_for_id_data_role, social_name, ' ', social_name, social_email, random_for_id_data_role, formattedDate, 1, soical_id], (err, results) => {
                 if (err) {
                     console.error('Error inserting into mod_customer :', err);
                     return res.status(500).json({ message: 'ไม่สามารถ register social *modcustomer', err });
