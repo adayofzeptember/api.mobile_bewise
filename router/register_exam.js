@@ -20,7 +20,7 @@ register_exam_router.post('/register', verifyToken, async (req, res) => {
             return res.status(500).json({ message: 'error', err });
         }
         if (results.length > 0) {
-            return res.status(200).json({message: 'ข้อมูลของคุณมีอยู่ในระบบแล้ว! กรุณาตรวจสอบข้อมูลของคุณอีกครั้ง สอบถามเพิ่มเติมได้ที่ Line OA @bewise'});
+            return res.status(200).json({ message: 'ข้อมูลของคุณมีอยู่ในระบบแล้ว! กรุณาตรวจสอบข้อมูลของคุณอีกครั้ง สอบถามเพิ่มเติมได้ที่ Line OA @bewise' });
         }
 
         const query_exam_register = `INSERT INTO dataregister_2026_april_r3 (

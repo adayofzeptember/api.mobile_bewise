@@ -179,7 +179,7 @@ user_data_router.post('/login', (req, res) => {
 
 
 
-// Get Profile Route (Always Fetch Fresh Data)
+//Get Profile Route (Always Fetch Fresh Data)
 user_data_router.get('/get_profile', verifyToken, (req, res) => {
     const userId = req.user.userId; // Extract userId from token
 
@@ -192,14 +192,14 @@ user_data_router.get('/get_profile', verifyToken, (req, res) => {
     mod_customer.surename, 
     mod_customer.id_card,
     mod_customer.id_customer,
-    
+
     user_address.address,
     user_address.district, 
     user_address.postcode,
     user_address.province,
     user_address.amphur,
     user_address.telephone,
-    
+
     user_images.name,
     user_images.directory
 
@@ -243,6 +243,77 @@ user_data_router.get('/get_profile', verifyToken, (req, res) => {
         });
     });
 });
+
+
+// user_data_router.get('/get_profile', verifyToken, (req, res) => {
+//     const userId = req.user.userId;
+
+//     const get_profile_query = `
+//   SELECT 
+//     users.user_email, 
+//     users.create_datetime,
+
+//     mod_customer.forename, 
+//     mod_customer.surename, 
+//     mod_customer.id_card,
+
+
+//     user_address.address,
+//     user_address.district, 
+//     user_address.postcode,
+//     user_address.province,
+//     user_address.amphur,
+//     user_address.telephone,
+
+//     user_images.name AS img_name,
+//     user_images.directory AS img_directory
+
+//   FROM users 
+//   LEFT JOIN mod_customer ON users.id_data_role = mod_customer.id_customer
+//   LEFT JOIN user_images ON users.id_data_role = user_images.id_user 
+//   LEFT JOIN user_address ON users.id_data_role = user_address.id_user 
+
+//   WHERE users.id_user = ? OR users.id_data_role = ?
+//   LIMIT 1
+// `;
+
+//     db_bewsie.query(get_profile_query, [userId, userId], (err, results) => {
+//         if (err) {
+//             console.error('DB error get_profile:', err);
+//             return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' });
+//         }
+
+//         if (!results || results.length === 0) {
+//             return res.status(404).json({ message: 'User not found' });
+//         }
+
+//         const user = results[0];
+
+//         res.status(200).json({
+//             message: 'Access granted',
+//             data: {
+//                 user: {
+//                     id_customer: user.id_customer || null,
+//                     email: user.user_email || "",
+//                     create_datetime: user.create_datetime || "",
+//                     forename: user.forename || "",
+//                     surename: user.surename || "",
+//                     id_card: user.id_card || "",
+//                     pic: {
+//                         name: user.img_name || "no-pic",
+//                         directory: user.img_directory || ""
+//                     },
+//                     address: user.address || "",
+//                     district: user.district || "",
+//                     postcode: user.postcode || "",
+//                     province: user.province || "",
+//                     amphur: user.amphur || "",
+//                     telephone: user.telephone || ""
+//                 }
+//             }
+//         });
+//     });
+// });
 
 
 
@@ -478,25 +549,36 @@ user_data_router.delete('/deleteUser', verifyToken, (req, res) => {
 
 
 user_data_router.post('/loginsocial', (req, res) => {
+    console.log('social');
 
     const { social_email, social_name, social_pic, soical_id } = req.body;
 
     const query_check_dup = 'SELECT user_email FROM users WHERE user_email = ?';
 
     db_bewsie.query(query_check_dup, [social_email], (err, results) => {
+
+        //console.log(results);
         if (err) {
             console.error('Database error:', err);
             return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' });
         }
         if (results.length > 0) {
+            console.log('login');
 
 
             //* ล็อคอิน 
             const login_social = `
-        SELECT users.*, mod_customer.* 
-        FROM users 
-        JOIN mod_customer ON users.id_data_role = mod_customer.id_customer 
-        WHERE user_name = ?`;
+            SELECT users.*, mod_customer.* 
+            FROM users 
+            JOIN mod_customer ON users.id_data_role = mod_customer.id_customer 
+            WHERE user_name = ?`;
+
+
+
+
+            //     const login_social = `
+            // SELECT *
+            // FROM mod_customer WHERE user_email = ?`;
 
 
             db_bewsie.query(login_social, [social_email], (err, resultLogin) => {
@@ -506,6 +588,9 @@ user_data_router.post('/loginsocial', (req, res) => {
                 }
 
                 const user = resultLogin[0];
+                console.log(user);
+
+
 
 
                 const token = jwt.sign(
@@ -514,12 +599,15 @@ user_data_router.post('/loginsocial', (req, res) => {
                     { expiresIn: '365d' }
                 );
 
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                console.log("userId in token:", decoded.userId);
+
                 return res.status(200).json({
                     message: 'เข้าสู่ระบบเสร็จสิ้น',
                     userInfo: {
                         id: user.id_data_role,
-                        name: user.forename,
-                        statusEmail: user.status
+                        // name: user.forename,
+                        // statusEmail: user.status
                     },
                     token: token
                 });
@@ -529,6 +617,7 @@ user_data_router.post('/loginsocial', (req, res) => {
             return;
 
         }
+        console.log('regis');
 
         //! regisใหม่ 
         const idrole = "od5e82971a2482d58br6369121200f54a4l";
