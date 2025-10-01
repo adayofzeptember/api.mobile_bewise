@@ -189,19 +189,7 @@ const verifyToken = require('../functions/auth');
 //! Path    
 const baseUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/uploads/${currentYear}/mod_customer`;
 const fileUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/file_BWG_April_R3_2026`;
-// const imageMimeTypes = [
-//     'image/jpeg',
-//     'image/png',
-//     'image/gif',
-//     'image/webp',
-//     'image/jpg'
-// ];
 
-// const imageAndPdfMimeTypes = [
-//     ...imageMimeTypes,
-//     'application/pdf'
-// ];
-// Storage for profile image
 const storageProfileImage = multer.diskStorage({
     destination: function (req, file, cb) {
         if (!fs.existsSync(baseUploadDir)) {

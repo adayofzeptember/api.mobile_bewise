@@ -158,10 +158,11 @@ user_data_router.post('/login', (req, res) => {
 
             //! Generate Token (Only Store userId)  userId จาก JWT ไว้เรียกใช้
             const token = jwt.sign(
-                { userId: user.id_data_role }, // Only storing user ID
+                { userId: user.id_data_role },
                 process.env.JWT_SECRET,
                 { expiresIn: '365d' }
             );
+            //! Generate Token (Only Store userId)  userId จาก JWT ไว้เรียกใช้
             res.status(200).json({
                 message: 'เข้าสู่ระบบเสร็จสิ้น: ' + user_name,
                 userInfo: {
@@ -227,7 +228,8 @@ user_data_router.get('/get_profile', verifyToken, (req, res) => {
                     surename: user.surename,
                     pic: {
                         name: user.name || "no-pic",
-                        directory: user.directory || "no-dir found",
+                        // directory: user.directory || "no-dir found",
+                        directory: user.directory ? user.directory : "",
                     },
                     id_card: user.id_card,
                     address: user.address || "", // If address is null, return empty string
@@ -487,9 +489,47 @@ user_data_router.post('/loginsocial', (req, res) => {
             return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' });
         }
         if (results.length > 0) {
-            // ล็อคอิน 
-            return res.status(200).json({ message: 'มีบัญชีอยู่แล้ว' });
+
+
+            //* ล็อคอิน 
+            const login_social = `
+        SELECT users.*, mod_customer.* 
+        FROM users 
+        JOIN mod_customer ON users.id_data_role = mod_customer.id_customer 
+        WHERE user_name = ?`;
+
+
+            db_bewsie.query(login_social, [social_email], (err, resultLogin) => {
+                if (err) {
+                    console.error('Error login social : ', err);
+                    return res.status(500).json({ message: 'ไม่สามารถ login social ', err });
+                }
+
+                const user = resultLogin[0];
+
+
+                const token = jwt.sign(
+                    { userId: user.id_data_role },
+                    process.env.JWT_SECRET,
+                    { expiresIn: '365d' }
+                );
+
+                return res.status(200).json({
+                    message: 'เข้าสู่ระบบเสร็จสิ้น',
+                    userInfo: {
+                        id: user.id_data_role,
+                        name: user.forename,
+                        statusEmail: user.status
+                    },
+                    token: token
+                });
+
+            });
+
+            return;
+
         }
+
         //! regisใหม่ 
         const idrole = "od5e82971a2482d58br6369121200f54a4l";
         const random_for_id_user = randomString(35);
@@ -498,7 +538,11 @@ user_data_router.post('/loginsocial', (req, res) => {
         const insert_users = `INSERT INTO users 
             (id_user, user_name, user_password, user_email, id_role, create_datetime, id_data_role, update_datetime) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-
+        const token = jwt.sign(
+            { userId: random_for_id_data_role },
+            process.env.JWT_SECRET,
+            { expiresIn: '365d' }
+        );
         // users
         db_bewsie.query(insert_users, [random_for_id_user, social_email, 'social_login', social_email, idrole, formattedDate, random_for_id_data_role, formattedDate], (err, results) => {
             if (err) {
@@ -527,15 +571,26 @@ user_data_router.post('/loginsocial', (req, res) => {
 
                     }
 
-                    return res.status(201).json({
+                    // const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                    // console.log("userId in token:", decoded.userId);
+
+                    // ✅ log ดูใน console
+                    //console.log("Response:", responseData);
+
+                    // ✅ ส่งออกไปให้ client
+
+                    const responseData = {
                         message: 'สมัครสมาชิกผ่าน social เรียบร้อย',
-                        data: {
+                        userInfo: {
                             id: random_for_id_data_role,
                             name: social_name,
                             email: social_email,
                             create_datetime: formattedDate,
-                        }
-                    });
+                        },
+                        token: token
+                    };
+
+                    return res.status(201).json(responseData);
                 });
 
 
@@ -546,7 +601,6 @@ user_data_router.post('/loginsocial', (req, res) => {
     });
 
 
-    // return res.status(200).json({ message: 'ไม่พบบัญชี' });
 
 
 });
