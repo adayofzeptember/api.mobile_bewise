@@ -480,156 +480,11 @@ user_data_router.delete('/deleteUser', verifyToken, (req, res) => {
 
 
 
-// user_data_router.post('/loginsocial', (req, res) => {
-
-//     const { social_email, social_name, social_pic, soical_id } = req.body;
-
-//     const query_check_dup = 'SELECT user_email FROM users WHERE user_email = ?';
-//     console.log(social_email);
-
-
-//     db_bewsie.query(query_check_dup, [social_email], (err, results) => {
-
-
-//         if (err) {
-//             console.error('Database error:', err);
-//             return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' });
-//         }
-//         if (results.length > 0) {
-//             console.log('login');
-//             // const login_social = `
-//             // SELECT *
-//             // FROM mod_customer WHERE user_email = ?`;
-
-//             const login_social = `SELECT users.*, mod_customer.* 
-//         FROM users 
-//         JOIN mod_customer ON users.id_data_role = mod_customer.id_customer 
-//         WHERE user_name = ?`;
-//             db_bewsie.query(login_social, [social_email], (err, resultLogin) => {
-//                 if (err) {
-//                     console.error('Error login social : ', err);
-//                     return res.status(500).json({ message: 'ไม่สามารถ login social ', err });
-//                 }
-
-//                 const user = resultLogin[0];
-//                 //  console.log(user);
-//                 console.log(user.id_data_role);
-
-
-//                 const token = jwt.sign(
-//                     { userId: user.id_data_role },
-//                     process.env.JWT_SECRET,
-//                     { expiresIn: '365d' }
-//                 );
-
-//                 // const decoded = jwt.verify(token, process.env.JWT_SECRET);
-//                 // console.log("userId in token:", decoded.userId);
-
-//                 return res.status(200).json({
-//                     message: 'เข้าสู่ระบบเสร็จสิ้น',
-//                     userInfo: {
-//                         id: user.id_data_role,
-//                         name: user.forename,
-//                         // id: user.id_customer,
-//                         // name: user.forename,
-//                         // statusEmail: user.status
-//                     },
-//                     token: token
-//                 });
-
-//             });
-
-//             return;
-
-//         }
-//         console.log('new regis');
-
-//         //! regisใหม่ 
-//         const idrole = "od5e82971a2482d58br6369121200f54a4l";
-//         const random_for_id_user = randomString(35);
-//         const random_for_id_data_role = randomString(35);
-//         const formattedDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
-//         const insert_users = `INSERT INTO users 
-//             (id_user, user_name, user_password, user_email, id_role, create_datetime, id_data_role, update_datetime, status) 
-//             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-//         const token = jwt.sign(
-//             { userId: random_for_id_data_role },
-//             process.env.JWT_SECRET,
-//             { expiresIn: '365d' }
-//         );
-//         // users
-//         db_bewsie.query(insert_users, [random_for_id_user, social_email, 'social_login', social_email, idrole, formattedDate, random_for_id_data_role, formattedDate, 1], (err, results) => {
-//             if (err) {
-//                 console.error('Error inserting into users: ', err);
-//                 return res.status(500).json({ message: 'ไม่สามารถ register social *users', err });
-//             }
-//             // mod
-//             const insert_mod_customer = `INSERT INTO mod_customer
-//                 (id_customer, forename, surename, forename_socail_late, user_email, create_id, create_datetime, user_email_verify, id_google) 
-//                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-//             db_bewsie.query(insert_mod_customer, [random_for_id_data_role, social_name, ' ', social_name, social_email, random_for_id_data_role, formattedDate, 1, soical_id], (err, results) => {
-//                 if (err) {
-//                     console.error('Error inserting into mod_customer :', err);
-//                     return res.status(500).json({ message: 'ไม่สามารถ register social *modcustomer', err });
-
-//                 }
-
-//                 //รุป
-//                 const insert_image = `INSERT INTO user_images (id_user, name, date, type)
-//                 VALUES(?, ?, ?, ?)`;
-
-//                 db_bewsie.query(insert_image, [random_for_id_data_role, social_pic, formattedDate, 1], (err, results) => {
-//                     if (err) {
-//                         console.error('Error inserting into mod_customer :', err);
-//                         return res.status(500).json({ message: 'ไม่สามารถ register social *images', err });
-
-//                     }
-
-//                     // const decoded = jwt.verify(token, process.env.JWT_SECRET);
-//                     // console.log("userId in token:", decoded.userId);
-
-//                     // ✅ log ดูใน console
-//                     //console.log("Response:", responseData);
-
-//                     // ✅ ส่งออกไปให้ client
-
-//                     const responseData = {
-//                         message: 'สมัครสมาชิกผ่าน social เรียบร้อย',
-//                         userInfo: {
-//                             id: random_for_id_data_role,
-//                             name: social_name,
-//                             email: social_email,
-//                             create_datetime: formattedDate,
-//                         },
-//                         token: token
-//                     };
-
-//                     return res.status(201).json(responseData);
-//                 });
-
-
-//             });
-
-
-//         });
-//     });
-
-
-
-
-// });
-
-
-
-
-
 user_data_router.post('/loginsocial', (req, res) => {
 
     const { social_email, social_name, social_pic, soical_id } = req.body;
 
     const query_check_dup = 'SELECT user_email FROM users WHERE user_email = ?';
-    console.log(social_email);
-
 
     db_bewsie.query(query_check_dup, [social_email], (err, results) => {
 
@@ -645,9 +500,9 @@ user_data_router.post('/loginsocial', (req, res) => {
             // FROM mod_customer WHERE user_email = ?`;
 
             const login_social = `SELECT users.*, mod_customer.* 
-                    FROM users 
-                        JOIN mod_customer ON users.id_data_role = mod_customer.id_customer 
-                    WHERE user_name = ?`;
+        FROM users 
+        JOIN mod_customer ON users.id_data_role = mod_customer.id_customer 
+        WHERE user_name = ?`;
             db_bewsie.query(login_social, [social_email], (err, resultLogin) => {
                 if (err) {
                     console.error('Error login social : ', err);
@@ -687,7 +542,145 @@ user_data_router.post('/loginsocial', (req, res) => {
         }
         console.log('new regis');
 
-  
+        //! regisใหม่ 
+        const idrole = "od5e82971a2482d58br6369121200f54a4l";
+        const random_for_id_user = randomString(35);
+        const random_for_id_data_role = randomString(35);
+        const formattedDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+        const insert_users = `INSERT INTO users 
+            (id_user, user_name, user_password, user_email, id_role, create_datetime, id_data_role, update_datetime, status) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const token = jwt.sign(
+            { userId: random_for_id_data_role },
+            process.env.JWT_SECRET,
+            { expiresIn: '365d' }
+        );
+        // users
+        db_bewsie.query(insert_users, [random_for_id_user, social_email, 'social_login', social_email, idrole, formattedDate, random_for_id_data_role, formattedDate, 1], (err, results) => {
+            if (err) {
+                console.error('Error inserting into users: ', err);
+                return res.status(500).json({ message: 'ไม่สามารถ register social *users', err });
+            }
+            // mod
+            const insert_mod_customer = `INSERT INTO mod_customer
+                (id_customer, forename, surename, forename_socail_late, user_email, create_id, create_datetime, user_email_verify, id_google) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+            db_bewsie.query(insert_mod_customer, [random_for_id_data_role, social_name, ' ', social_name, social_email, random_for_id_data_role, formattedDate, 1, soical_id], (err, results) => {
+                if (err) {
+                    console.error('Error inserting into mod_customer :', err);
+                    return res.status(500).json({ message: 'ไม่สามารถ register social *modcustomer', err });
+
+                }
+
+                //รุป
+                const insert_image = `INSERT INTO user_images (id_user, name, date, type)
+                VALUES(?, ?, ?, ?)`;
+
+                db_bewsie.query(insert_image, [random_for_id_data_role, social_pic, formattedDate, 1], (err, results) => {
+                    if (err) {
+                        console.error('Error inserting into mod_customer :', err);
+                        return res.status(500).json({ message: 'ไม่สามารถ register social *images', err });
+
+                    }
+
+                    // const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                    // console.log("userId in token:", decoded.userId);
+
+                    // ✅ log ดูใน console
+                    //console.log("Response:", responseData);
+
+                    // ✅ ส่งออกไปให้ client
+
+                    const responseData = {
+                        message: 'สมัครสมาชิกผ่าน social เรียบร้อย',
+                        userInfo: {
+                            id: random_for_id_data_role,
+                            name: social_name,
+                            email: social_email,
+                            create_datetime: formattedDate,
+                        },
+                        token: token
+                    };
+
+                    return res.status(201).json(responseData);
+                });
+
+
+            });
+
+
+        });
+    });
+
+});
+
+
+
+user_data_router.post('/loginsocial_apple', (req, res) => {
+
+    const { social_email, social_name, social_pic, soical_id } = req.body;
+
+    const query_check_dup = 'SELECT user_email FROM mod_customer WHERE id_google = ?';
+
+    db_bewsie.query(query_check_dup, [soical_id], (err, results) => {
+
+
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' });
+        }
+        if (results.length > 0) {
+            console.log('ซ้ำ login');
+            console.log(results[0].user_email);
+
+
+
+            const login_social = `SELECT users.*, mod_customer.* 
+            FROM users 
+            JOIN mod_customer ON users.id_data_role = mod_customer.id_customer 
+            WHERE user_name = ?`;
+            db_bewsie.query(login_social, [results[0].user_email], (err, resultLogin) => {
+                if (err) {
+                    console.error('Error login social : ', err);
+                    return res.status(500).json({ message: 'ไม่สามารถ login social ', err });
+                }
+
+                const user = resultLogin[0];
+                //  console.log(user);
+                console.log(user.id_data_role);
+
+
+                const token = jwt.sign(
+                    { userId: user.id_data_role },
+                    process.env.JWT_SECRET,
+                    { expiresIn: '365d' }
+                );
+
+                const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                console.log("userId in token:", decoded.userId);
+
+                return res.status(200).json({
+                    message: 'เข้าสู่ระบบเสร็จสิ้น',
+                    userInfo: {
+                        id: user.id_data_role,
+                        name: user.forename,
+                        // id: user.id_customer,
+                        // name: user.forename,
+                        // statusEmail: user.status
+                    },
+                    token: token
+                });
+
+            });
+
+            return;
+
+        }
+        console.log('ไม่ซ้ำ');
+
+
+
+        console.log('new regis');
         const idrole = "od5e82971a2482d58br6369121200f54a4l";
         const random_for_id_user = randomString(35);
         const random_for_id_data_role = randomString(35);
