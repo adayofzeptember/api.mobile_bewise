@@ -630,8 +630,8 @@ user_data_router.post('/loginsocial_apple', (req, res) => {
             return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' });
         }
         if (results.length > 0) {
-            console.log('ซ้ำ login');
-            console.log(results[0].user_email);
+            // console.log('ซ้ำ login');
+            // console.log(results[0].user_email);
 
 
 
@@ -647,7 +647,7 @@ user_data_router.post('/loginsocial_apple', (req, res) => {
 
                 const user = resultLogin[0];
                 //  console.log(user);
-                console.log(user.id_data_role);
+                // console.log(user.id_data_role);
 
 
                 const token = jwt.sign(
