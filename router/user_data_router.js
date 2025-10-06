@@ -503,7 +503,7 @@ user_data_router.post('/loginsocial', (req, res) => {
         FROM users 
         JOIN mod_customer ON users.id_data_role = mod_customer.id_customer 
         WHERE user_name = ?`;
-            db_bewsie.query(login_social, [social_email], (err, resultLogin) => {
+            db_bewsie.query(login_social, [soical_id], (err, resultLogin) => {
                 if (err) {
                     console.error('Error login social : ', err);
                     return res.status(500).json({ message: 'ไม่สามารถ login social ', err });
@@ -511,7 +511,7 @@ user_data_router.post('/loginsocial', (req, res) => {
 
                 const user = resultLogin[0];
                 //  console.log(user);
-                console.log(user.id_data_role);
+                console.log('นี่ไง: ' + user.id_data_role);
 
 
                 const token = jwt.sign(
@@ -556,7 +556,7 @@ user_data_router.post('/loginsocial', (req, res) => {
             { expiresIn: '365d' }
         );
         // users
-        db_bewsie.query(insert_users, [random_for_id_user, social_email, 'social_login', social_email, idrole, formattedDate, random_for_id_data_role, formattedDate, 1], (err, results) => {
+        db_bewsie.query(insert_users, [random_for_id_user, soical_id, 'social_login', social_email, idrole, formattedDate, random_for_id_data_role, formattedDate, 1], (err, results) => {
             if (err) {
                 console.error('Error inserting into users: ', err);
                 return res.status(500).json({ message: 'ไม่สามารถ register social *users', err });
@@ -656,8 +656,8 @@ user_data_router.post('/loginsocial_apple', (req, res) => {
                     { expiresIn: '365d' }
                 );
 
-                const decoded = jwt.verify(token, process.env.JWT_SECRET);
-                console.log("userId in token:", decoded.userId);
+                // const decoded = jwt.verify(token, process.env.JWT_SECRET);
+                // console.log("userId in token:", decoded.userId);
 
                 return res.status(200).json({
                     message: 'เข้าสู่ระบบเสร็จสิ้น',
