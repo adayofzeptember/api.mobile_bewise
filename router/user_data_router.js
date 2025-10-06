@@ -511,7 +511,7 @@ user_data_router.post('/loginsocial', (req, res) => {
 
                 const user = resultLogin[0];
                 //  console.log(user);
-                console.log('นี่ไง: ' + user.id_data_role);
+                console.log(user.id_data_role);
 
 
                 const token = jwt.sign(
