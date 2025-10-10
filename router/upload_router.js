@@ -188,7 +188,7 @@ const verifyToken = require('../functions/auth');
 
 //! Path    
 const baseUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/uploads/${currentYear}/mod_customer`;
-const fileUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/file_BWG_April_R3_2026`;
+const fileUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/file_BWG_April_R4_2026`;
 
 const storageProfileImage = multer.diskStorage({
     destination: function (req, file, cb) {

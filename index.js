@@ -35,7 +35,7 @@ process.on("uncaughtException", (err) => {
   log_error.error("🔥 Uncaught Exception:", err);
   console.log(err);
 
-  // แค่ log เอาไว้ก่อน ยังให้ server รันต่อ
+  // แค่ log เอาไว้ก่อน ยังห้ใ server รันต่อ
 });
 
 process.on("unhandledRejection", (reason, promise) => {
@@ -50,7 +50,7 @@ app.listen(onPort, () => {
 
 
 
-  //  data.datetime = {
-  //           date: '12 ตุลาคม 2568',
-  //           time: '12.00 - 14.30 น.'
-  //       };
+//  data.datetime = {
+//           date: '12 ตุลาคม 2568',
+//           time: '12.00 - 14.30 น.'
+//       };
