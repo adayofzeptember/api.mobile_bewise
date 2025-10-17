@@ -194,6 +194,7 @@ user_data_router.get('/get_profile', verifyToken, (req, res) => {
     mod_customer.surename, 
     mod_customer.id_card,
     mod_customer.id_customer,
+    mod_customer.id_google,
 
     user_address.address,
     user_address.district, 
@@ -213,8 +214,8 @@ user_data_router.get('/get_profile', verifyToken, (req, res) => {
 
 
     db_bewsie.query(get_profile_query, [userId], (err, results) => {
-        if (err || results.length === 0) {
-            return res.status(404).json({ message: 'User not found' });
+        if (err) {
+            return res.status(404).json({ message: 'error' });
         }
 
         const user = results[0]; // Get fresh user info
@@ -224,6 +225,7 @@ user_data_router.get('/get_profile', verifyToken, (req, res) => {
             data: {
                 user: {
                     id_customer: user.id_customer,
+                    social: user.id_google,
                     email: user.user_email,
                     create_datetime: user.create_datetime,
                     forename: user.forename,
@@ -234,7 +236,7 @@ user_data_router.get('/get_profile', verifyToken, (req, res) => {
                         directory: user.directory ? user.directory : "",
                     },
                     id_card: user.id_card,
-                    address: user.address || "", // If address is null, return empty string
+                    address: user.address || "",
                     district: user.district || "",
                     postcode: user.postcode || "",
                     province: user.province || "",
@@ -245,8 +247,6 @@ user_data_router.get('/get_profile', verifyToken, (req, res) => {
         });
     });
 });
-
-
 
 
 user_data_router.put('/update_user/:id', verifyToken, (req, res) => {
@@ -287,7 +287,7 @@ user_data_router.put('/update_user/:id', verifyToken, (req, res) => {
                     }
 
                     return res.status(200).json({
-                        message: 'update เรียบร้อย id:' + userId,
+                        message: 'update ข้อมูลเสร็จสิ้น' + userId,
                         data: {
                             id_user:
                                 userId,
@@ -323,7 +323,7 @@ user_data_router.put('/update_user/:id', verifyToken, (req, res) => {
                             return res.status(500).json({ message: 'Internal Server Error UPDATE mod_customer ERROR' });
                         }
                         return res.status(201).json({
-                            message: 'insert ข้อมูลใหม่เรียบร้อย id:' + userId,
+                            message: 'insert ข้อมูลเรียบร้อย',
                             data: {
                                 id_user: userId,
                                 firstname,
@@ -624,7 +624,6 @@ user_data_router.post('/loginsocial_apple', (req, res) => {
 
     db_bewsie.query(query_check_dup, [soical_id], (err, results) => {
 
-
         if (err) {
             console.error('Database error:', err);
             return res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' });
@@ -632,8 +631,6 @@ user_data_router.post('/loginsocial_apple', (req, res) => {
         if (results.length > 0) {
             // console.log('ซ้ำ login');
             // console.log(results[0].user_email);
-
-
 
             const login_social = `SELECT users.*, mod_customer.* 
             FROM users 

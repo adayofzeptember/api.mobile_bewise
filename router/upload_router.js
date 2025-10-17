@@ -259,7 +259,7 @@ upload_router.post('/upload_profile_pic', verifyToken, uploadImage.single('photo
                     return res.status(500).json({ message: 'Internal Server Error' });
                 }
                 return res.status(201).json({
-                    message: "[updated] อัปโหลดรูปภาพแล้ว",
+                    message: "อัปโหลดรูปภาพใหม่แล้ว",
                     userID,
                     file: {
                         path: req.file.path,
@@ -283,7 +283,7 @@ upload_router.post('/upload_profile_pic', verifyToken, uploadImage.single('photo
                 }
 
                 return res.status(201).json({
-                    message: "[insert] อัปโหลดรูปภาพใหม่แล้ว",
+                    message: "อัปโหลดรูปภาพแล้ว",
                     userID,
                     file: {
                         path: req.file.path,
