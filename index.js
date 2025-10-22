@@ -17,8 +17,9 @@ app.use('/exam_register', register_exam_router);
 
 
 app.use('/upload', upload_router);
-//app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/uploads', express.static('/newdata/vhosts/bewise-global.com/httpdocs/uploads'));
+
+//app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 app.use((err, req, res, next) => {

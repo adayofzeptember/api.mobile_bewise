@@ -1,0 +1,16 @@
+{
+    "code": "w8",
+    "message": "",
+    "Docs": [
+        {
+            "name": "บัตร ปชช",
+            "status": "ไมาผ่าน",
+            "remark": "ไม่มีรูป"
+        },
+        {
+            "name": "GPA",
+            "status": "ผ่าน",
+            "remark": "-"
+        }
+    ]
+}
