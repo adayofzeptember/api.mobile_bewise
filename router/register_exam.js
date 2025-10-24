@@ -547,7 +547,7 @@ register_exam_router.post('/generate-qr', async (req, res) => {
         // 3. เตรียมข้อมูลที่จะส่งไป GBPrimePay
         const dataToSend = new URLSearchParams(); // GBPrimePay รับ Content-Type 'x-www-form-urlencoded'
         dataToSend.append('token', 'KeNIJ50Gg0FL7lALnLRaHeGpGZZug/fubn1OhCcnHd7v+QFLGkklaNdE3M6jnUn9HikOt11vRiHQ3KeCxKJvWW7mlbNAotkgwCOqfUTVYIyac10zHuYUIX8YwPLtTg+TiBUyizWpUwXCQcz2NdYjEKWTlno=');
-        dataToSend.append('amount', '30.00'); // เช่น '300.00'
+        dataToSend.append('amount', '300.00'); // เช่น '300.00'
         dataToSend.append('backgroundUrl', 'https://bewise-global.com/gbprimepay/promptpay/webhook_gb_pp_full_final');
         //*
         dataToSend.append('referenceNo', referenceNo);
@@ -568,7 +568,7 @@ register_exam_router.post('/generate-qr', async (req, res) => {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                responseType: 'arraybuffer', // ❗️ สำคัญมาก: บอก axios ให้รับข้อมูลเป็น 'bytes'
+                responseType: 'arraybuffer',  
             }
         );
 
