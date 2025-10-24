@@ -441,6 +441,8 @@ register_exam_router.get('/register_info', verifyToken, (req, res) => {
         if (err) {
             return res.status(400).json({ error: 'error: ' + err.message });
         }
+
+
         if (results.length === 0) {
             return res.status(200).json({
                 data: null,
@@ -485,7 +487,7 @@ register_exam_router.get('/gbpayCheck', verifyToken, (req, res) => {
         if (err || results.length == 0) {
             return res.status(200).json({
                 status_code: '0',
-                message: 'ยังไม่จ่ายด'
+                message: 'ยังไม่จ่าย'
 
             });
         }
@@ -568,7 +570,7 @@ register_exam_router.post('/generate-qr', async (req, res) => {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                responseType: 'arraybuffer',  
+                responseType: 'arraybuffer',
             }
         );
 
