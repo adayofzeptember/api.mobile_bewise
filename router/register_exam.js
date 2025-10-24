@@ -2,8 +2,8 @@ const express = require('express');
 const db_bewsie = require('../db/db_bewise');
 const register_exam_router = express.Router();
 const verifyToken = require('../functions/auth');
-const user_data_router = require('./user_data_router');
-const { da } = require('date-fns/locale');
+
+
 const axios = require('axios');
 require('dotenv').config(); // โหลดตัวแปรจากไฟล์ .env
 
@@ -530,7 +530,7 @@ register_exam_router.put('/update_idcard_afterRegis', verifyToken, (req, res) =>
 
 register_exam_router.post('/generate-qr', async (req, res) => {
     try {
-      
+
         const {
             referenceNo,
             detail,
@@ -546,8 +546,8 @@ register_exam_router.post('/generate-qr', async (req, res) => {
 
         // 3. เตรียมข้อมูลที่จะส่งไป GBPrimePay
         const dataToSend = new URLSearchParams(); // GBPrimePay รับ Content-Type 'x-www-form-urlencoded'
-        dataToSend.append('token', apiToken);
-        dataToSend.append('amount', '300.00'); // เช่น '300.00'
+        dataToSend.append('token', 'KeNIJ50Gg0FL7lALnLRaHeGpGZZug/fubn1OhCcnHd7v+QFLGkklaNdE3M6jnUn9HikOt11vRiHQ3KeCxKJvWW7mlbNAotkgwCOqfUTVYIyac10zHuYUIX8YwPLtTg+TiBUyizWpUwXCQcz2NdYjEKWTlno=');
+        dataToSend.append('amount', '30.00'); // เช่น '300.00'
         dataToSend.append('backgroundUrl', 'https://bewise-global.com/gbprimepay/promptpay/webhook_gb_pp_full_final');
         //*
         dataToSend.append('referenceNo', referenceNo);
@@ -580,15 +580,11 @@ register_exam_router.post('/generate-qr', async (req, res) => {
     } catch (error) {
         console.error('--- ❌ GBPrimePay Error (NodeJS) ---');
         if (error.response) {
-            // ถ้า GBPrimePay ตอบ Error กลับมา (เช่น Token ผิด, เงินผิด)
-            // มันจะส่ง Error มาเป็น text/json ไม่ใช่ 'arraybuffer'
-            // เราต้องแปลงมันกลับเป็น String เพื่ออ่าน
             const errorData = Buffer.from(error.response.data, 'binary').toString('utf8');
             console.error('Status:', error.response.status);
             console.error('Data:', errorData);
             res.status(500).json({ error: 'GBPrimePay Error', details: errorData });
         } else {
-            // ถ้า Error จากโค้ดเราเอง
             console.error('Error:', error.message);
             res.status(500).json({ error: 'Internal Server Error', details: error.message });
         }
