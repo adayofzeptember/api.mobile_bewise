@@ -5,6 +5,8 @@ const user_data_router = require('./router/user_data_router');
 const register_exam_router = require('./router/register_exam');
 const path = require('path');
 const log_error = require('./functions/log_error');
+const axios = require('axios');
+require('dotenv').config(); // โหลดตัวแปรจากไฟล์ .env
 const { constants } = require('module');
 
 dotenv.config();

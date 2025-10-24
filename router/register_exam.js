@@ -4,6 +4,8 @@ const register_exam_router = express.Router();
 const verifyToken = require('../functions/auth');
 const user_data_router = require('./user_data_router');
 const { da } = require('date-fns/locale');
+const axios = require('axios');
+require('dotenv').config(); // โหลดตัวแปรจากไฟล์ .env
 
 register_exam_router.post('/register', verifyToken, async (req, res) => {
     const { format, constructFrom } = require('date-fns');
@@ -523,6 +525,74 @@ register_exam_router.put('/update_idcard_afterRegis', verifyToken, (req, res) =>
             data: idcard
         });
     });
+});
+
+
+register_exam_router.post('/generate-qr', async (req, res) => {
+    try {
+      
+        const {
+            referenceNo,
+            detail,
+            customerAddress,
+            customerEmail,
+            customerTelephone,
+            merchantDefined1,
+            merchantDefined2
+        } = req.body;
+
+        // 2. ดึง Token ลับมาจาก .env (ปลอดภัย 100%)
+        const apiToken = process.env.GBPRIMEPAY_TOKEN;
+
+        // 3. เตรียมข้อมูลที่จะส่งไป GBPrimePay
+        const dataToSend = new URLSearchParams(); // GBPrimePay รับ Content-Type 'x-www-form-urlencoded'
+        dataToSend.append('token', apiToken);
+        dataToSend.append('amount', '300.00'); // เช่น '300.00'
+        dataToSend.append('backgroundUrl', 'https://bewise-global.com/gbprimepay/promptpay/webhook_gb_pp_full_final');
+        //*
+        dataToSend.append('referenceNo', referenceNo);
+        dataToSend.append('detail', detail);
+        dataToSend.append('customerAddress', customerAddress);
+        dataToSend.append('customerEmail', customerEmail);
+        dataToSend.append('customerTelephone', customerTelephone);
+        dataToSend.append('merchantDefined1', merchantDefined1);
+        dataToSend.append('merchantDefined2', merchantDefined2);
+
+        console.log('Sending data to GBPrimePay:', dataToSend);
+
+        // 4. ยิง API ไปหา GBPrimePay จากหลังบ้าน
+        const gbResponse = await axios.post(
+            'https://api.gbprimepay.com/v3/qrcode',
+            dataToSend,
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                responseType: 'arraybuffer', // ❗️ สำคัญมาก: บอก axios ให้รับข้อมูลเป็น 'bytes'
+            }
+        );
+
+        // 5. ส่ง QR Code (ที่เป็น 'bytes') กลับไปให้ Flutter
+        console.log('Successfully got QR from GBPrimePay!');
+        res.setHeader('Content-Type', 'image/png'); // บอก Flutter ว่านี่คือไฟล์ภาพ
+        res.send(gbResponse.data);
+
+    } catch (error) {
+        console.error('--- ❌ GBPrimePay Error (NodeJS) ---');
+        if (error.response) {
+            // ถ้า GBPrimePay ตอบ Error กลับมา (เช่น Token ผิด, เงินผิด)
+            // มันจะส่ง Error มาเป็น text/json ไม่ใช่ 'arraybuffer'
+            // เราต้องแปลงมันกลับเป็น String เพื่ออ่าน
+            const errorData = Buffer.from(error.response.data, 'binary').toString('utf8');
+            console.error('Status:', error.response.status);
+            console.error('Data:', errorData);
+            res.status(500).json({ error: 'GBPrimePay Error', details: errorData });
+        } else {
+            // ถ้า Error จากโค้ดเราเอง
+            console.error('Error:', error.message);
+            res.status(500).json({ error: 'Internal Server Error', details: error.message });
+        }
+    }
 });
 
 
