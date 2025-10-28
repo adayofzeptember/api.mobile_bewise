@@ -3,7 +3,6 @@ const db_bewsie = require('../db/db_bewise');
 const register_exam_router = express.Router();
 const verifyToken = require('../functions/auth');
 
-
 const axios = require('axios');
 require('dotenv').config(); // โหลดตัวแปรจากไฟล์ .env
 
@@ -160,8 +159,6 @@ register_exam_router.put('/update_docs2/:check', verifyToken, (req, res) => {
 });
 
 
-
-
 register_exam_router.post('/insert_payment/:id', verifyToken, (req, res) => {
     //! insert ลง table การชำระเงิน
 
@@ -196,7 +193,6 @@ register_exam_router.post('/insert_payment/:id', verifyToken, (req, res) => {
     });
 });
 
-//? เช็คสมัครรึยัง
 register_exam_router.get('/check_register', verifyToken, (req, res) => {
     const userId = req.user.userId;
     const queryCheckRegis = 'SELECT * FROM dataregister_2026_april_r4 WHERE id_customer = ?';
@@ -210,7 +206,6 @@ register_exam_router.get('/check_register', verifyToken, (req, res) => {
 
 });
 
-//? get to check เอกสาร, ชำระเงิน
 register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
     const check = req.params.type_check;
     const userId = req.user.userId;// Extract userId from token
@@ -325,8 +320,8 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
                     }
 
                     return res.status(200).json({
-                        code: "ไม่เข้าเงื่อนไข",
-                        message: 'x',
+                        code: "x",
+                        message: 'ไม่เข้าเงื่อนไข',
 
                     });
 
@@ -338,11 +333,13 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
     else if (check == 'register') {
         const queryCheckRegis = 'SELECT id_customer FROM dataregister_2026_april_r4 WHERE id_customer = ?';
         db_bewsie.query(queryCheckRegis, [userId], (err, results) => {
+            // สมัครรึยีัง 
             if (results.length == 0) {
                 return res.status(200).json({ message: 'no-register' });
             }
-
+            // ถ้าสมัครแล้ว จ่ายเงินรึยัง 1. payment_screen, 2. infoCheck
             else {
+                // ต้องเปลี่ยนตรงนรี้เพื่อ tiktok 
                 const queryCheckPay = 'SELECT idcard_std FROM data_gb_prime_pay WHERE idcard_std = ?';
                 const { idcard_std } = req.body;
                 db_bewsie.query(queryCheckPay, [idcard_std], (err, results) => {
@@ -350,39 +347,14 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
                         return res.status(400).json({ error: 'เช็ค payment error ' + err.message });
                     }
                     else {
-
                         return res.status(200).json({ length: results.length });
-                        // if (results.length == 0) {
-                        //     return res.status(200).json({ message: 'not yet', "code": "payment-0", "data": "ยังไม่จ่ายเงิน" });
-                        // }
-                        // else {
-                        //     return res.status(200).json({ message: 'paidh', "code": "payment-1", "data": "จ่ายเงินแล้ว" });
-                        // }
                     }
                 });
             }
-
-            // else {
-            //     const queryCheckPay = 'SELECT idcard_std, idcard_std FROM datapayment_2026_april_r1 WHERE id_customer = ?';
-            //     db_bewsie.query(queryCheckPay, [userId], (err, results) => {
-            //         if (err) {
-            //             return res.status(400).json({ error: 'เช็ค payment error ' + err.message });
-            //         }
-            //         else {
-            //             if (results.length == 0) {
-            //                 return res.status(200).json({ message: 'ยังไม่จ่ายเงิน', "code": "payment-0" });
-            //             }
-            //             else {
-            //                 return res.status(200).json({ message: 'จ่ายเงินแล้ว', "code": "payment-1" });
-            //             }
-            //         }
-            //     });
-            // }
         });
     }
 });
 
-//! ใส่ไว้ใน update after slip
 
 register_exam_router.put('/update_idcard_std', verifyToken, (req, res) => {
     //! อัปเดทรหัส นร ไปยัง data 
@@ -408,7 +380,6 @@ register_exam_router.put('/update_idcard_std', verifyToken, (req, res) => {
     });
 });
 
-//! 
 register_exam_router.get('/register_info', verifyToken, (req, res) => {
     const userId = req.user.userId;
     const queryCheckRegis = `
@@ -477,7 +448,7 @@ register_exam_router.get('/register_info', verifyToken, (req, res) => {
         return res.status(200).json({ data });
     });
 });
-//* gbpay check 
+
 register_exam_router.get('/gbpayCheck', verifyToken, (req, res) => {
 
     const { idcard_std } = req.query;
@@ -504,7 +475,6 @@ register_exam_router.get('/gbpayCheck', verifyToken, (req, res) => {
 });
 
 
-//อัปเดทเลขบัตรไป mod_ หลังสมัคร
 register_exam_router.put('/update_idcard_afterRegis', verifyToken, (req, res) => {
     //! อัปเดทรหัส นร ไปยัง data 
     const userId = req.user.userId;
@@ -543,10 +513,9 @@ register_exam_router.post('/generate-qr', async (req, res) => {
             merchantDefined2
         } = req.body;
 
-        // 2. ดึง Token ลับมาจาก .env (ปลอดภัย 100%)
-        const apiToken = process.env.GBPRIMEPAY_TOKEN;
 
-        // 3. เตรียมข้อมูลที่จะส่งไป GBPrimePay
+
+
         const dataToSend = new URLSearchParams(); // GBPrimePay รับ Content-Type 'x-www-form-urlencoded'
         dataToSend.append('token', 'KeNIJ50Gg0FL7lALnLRaHeGpGZZug/fubn1OhCcnHd7v+QFLGkklaNdE3M6jnUn9HikOt11vRiHQ3KeCxKJvWW7mlbNAotkgwCOqfUTVYIyac10zHuYUIX8YwPLtTg+TiBUyizWpUwXCQcz2NdYjEKWTlno=');
         dataToSend.append('amount', '300.00'); // เช่น '300.00'
@@ -560,9 +529,7 @@ register_exam_router.post('/generate-qr', async (req, res) => {
         dataToSend.append('merchantDefined1', merchantDefined1);
         dataToSend.append('merchantDefined2', merchantDefined2);
 
-        console.log('Sending data to GBPrimePay:', dataToSend);
 
-        // 4. ยิง API ไปหา GBPrimePay จากหลังบ้าน
         const gbResponse = await axios.post(
             'https://api.gbprimepay.com/v3/qrcode',
             dataToSend,
@@ -574,9 +541,8 @@ register_exam_router.post('/generate-qr', async (req, res) => {
             }
         );
 
-        // 5. ส่ง QR Code (ที่เป็น 'bytes') กลับไปให้ Flutter
-        console.log('Successfully got QR from GBPrimePay!');
-        res.setHeader('Content-Type', 'image/png'); // บอก Flutter ว่านี่คือไฟล์ภาพ
+
+        res.setHeader('Content-Type', 'image/png');
         res.send(gbResponse.data);
 
     } catch (error) {
@@ -744,6 +710,96 @@ register_exam_router.get('/zoom', verifyToken, (req, res) => {
 
 });
 
+
+
+
+register_exam_router.post('/tiktok-pay', async (req, res) => {
+    try {
+        const {
+            tiktok_code,
+            idcard_std,
+            idcard_std2,
+            fullname,
+            id_customer,
+        } = req.body;
+
+
+        const safeIdCardStd = idcard_std || '';
+        const safeIdCardStd2 = idcard_std2 || '';
+        const safeFullname = fullname || '';
+
+        const encodedIdCardStd = Buffer.from(safeIdCardStd, 'utf8').toString('base64');
+        const encodedIdCardStd2 = Buffer.from(safeIdCardStd2, 'utf8').toString('base64');
+        const encodedFullname = Buffer.from(safeFullname, 'utf8').toString('base64');
+
+        const dataToSend = new URLSearchParams();
+
+        dataToSend.append('_method', 'CHECK_TIKTOK_PAYMENT');
+        dataToSend.append('round', '4');
+        dataToSend.append('month', 'april');
+        dataToSend.append('year', '2026');
+
+        dataToSend.append('tiktok_code', tiktok_code);
+        dataToSend.append('idcard_std', encodedIdCardStd);
+        dataToSend.append('idcard_std2', encodedIdCardStd2);
+        dataToSend.append('fullname', encodedFullname);
+        dataToSend.append('id_customer', id_customer);
+
+        const gbResponse = await axios.post(
+            'https://bewise-global.com/functions_m',
+            dataToSend,
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+
+            }
+        );
+
+        const responseData = gbResponse.data;
+
+
+        if (responseData.status == "1") {
+
+
+            const insert_gbpay = `INSERT INTO data_gb_prime_pay 
+            (idcard_std, idcard) 
+            VALUES (?, ?)`;
+
+            db_bewsie.query(insert_gbpay, [idcard_std2, idcard_std], (err, results) => {
+                if (err) {
+
+                    return res.status(500).json({ message: 'เกิดข้อผิดพลาด' });
+                }
+                res.status(200).json({ "status": 1 });
+            });
+
+
+        } else if (responseData.status == "0") {
+
+            res.status(200).json({ "status": 0 });
+
+        } else {
+            console.log('Unknown API Status:', responseData);
+            res.status(500).json({ error: "Unknown status from functions_m" });
+        }
+
+
+
+
+    } catch (error) {
+        console.error('--- ❌ TikTok Pay Error (NodeJS) ---');
+        if (error.response) {
+
+            console.error('Status:', error.response.status);
+            console.error('Data:', error.response.data); // <-- อ่าน .data ตรงๆ ได้เลย
+            res.status(500).json({ error: 'API Error', details: error.response.data });
+        } else {
+            console.error('Error:', error.message);
+            res.status(500).json({ error: 'Internal Server Error', details: error.message });
+        }
+    }
+});
 
 module.exports = register_exam_router;
 

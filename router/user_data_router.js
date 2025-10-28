@@ -7,25 +7,6 @@ const randomString = require('../functions/random_string');
 const verifyToken = require('../functions/auth');
 const { format } = require('date-fns');
 
-//!
-user_data_router.get('/get_branch', (req, res) => {
-    const query_checkRole = "SELECT code_branch FROM branch WHERE code_branch = 'BWG_R1_APRIL_2026'";
-    db_bewsie.query(query_checkRole, (err, results) => {
-        if (err) {
-            console.error('ERROR QUERY ---> ', err.message);
-            res.status(500).send('error');
-            return;
-        }
-        else {
-            res.status(200).json({
-                data: results[0]
-                //! เอา [0]ออก   เป็น list
-            });
-            // res.json(results[0]);
-        }
-
-    });
-});
 
 user_data_router.get('/get_branchs', (req, res) => {
     const query_checkRole = "SELECT code_branch FROM branch'";
@@ -178,7 +159,6 @@ user_data_router.post('/login', (req, res) => {
         });
     });
 });
-
 
 
 //Get Profile Route (Always Fetch Fresh Data)
@@ -340,46 +320,6 @@ user_data_router.put('/update_user/:id', verifyToken, (req, res) => {
                 }
             });
         }
-    });
-});
-
-user_data_router.get('/get_log_login', verifyToken, (req, res) => {
-    const userId = req.user.userId;
-
-    const get_log_query = `
-        SELECT create_datetime, ip_address, browser
-        FROM user_bwg_log_login 
-        WHERE id_user_bwg = ?`;
-
-    db_bewsie.query(get_log_query, [userId], (err, results) => {
-        if (err || results.length === 0) {
-            return res.status(404).json({ message: 'ไม่มี log' });
-        }
-        res.status(200).json({
-            data: {
-                results
-            }
-        });
-    });
-});
-
-
-user_data_router.post('/log_login', verifyToken, (req, res) => {
-    const userId = req.user.userId;
-    const ip_address = req.body.ip_address;
-    const formattedDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
-    const insert_log_login = `INSERT INTO user_bwg_log_login 
-        (id_user_bwg, create_datetime, ip_address, browser) 
-        VALUES (?, ?, ?, ?)`;
-
-    db_bewsie.query(insert_log_login, [userId, formattedDate, ip_address, 'Bewise Mobile Application'], (err, results) => {
-        if (err) {
-            return res.status(400).json({ error: err.message });
-        }
-        return res.status(200).json({
-            message: 'log inserted successfully',
-            data: results
-        });
     });
 });
 
