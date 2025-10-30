@@ -112,7 +112,7 @@ register_exam_router.put('/update_afterslip', verifyToken, (req, res) => {
     });
 });
 
-register_exam_router.put('/update_docs2/:check', verifyToken, (req, res) => {
+register_exam_router.put('/Update_Docs/:check', verifyToken, (req, res) => {
     //! อัปเดทส่งเอกสารรอบ 2 
 
     const userID = req.user.userId;
