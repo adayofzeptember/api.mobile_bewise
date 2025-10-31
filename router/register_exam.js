@@ -13,7 +13,7 @@ register_exam_router.post('/register', verifyToken, async (req, res) => {
     const query_check = 'SELECT id_customer FROM dataregister_2026_april_r4 WHERE id_customer = ?';
     const { id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng, datanickname, datanickname_eng,
         dataage, gender, datanation, datatel, dataidline, dataemail, dataadd,
-        districts, amphurs, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school, datalevel,
+        districts, amphurs, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school, school_type, datalevel,
         dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, code_branch, databd, file_idcard, file_gpa } = req.body;
 
     db_bewsie.query(query_check, [id_customer], (err, results) => {
@@ -28,13 +28,13 @@ register_exam_router.post('/register', verifyToken, async (req, res) => {
         const query_exam_register = `INSERT INTO dataregister_2026_april_r4 (
         id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng, 
         datanickname, datanickname_eng, dataage, gender, datanation, datatel, dataidline, dataemail, dataadd, 
-        districts, amphures, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school, datalevel, 
+        districts, amphures, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school,school_type, datalevel, 
         dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, date_regis, branch, databd, file_idcard, file_gpa
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);`;
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);`;
 
         db_bewsie.query(query_exam_register, [id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng,
             datanickname, datanickname_eng, dataage, gender, datanation, datatel, dataidline, dataemail, dataadd,
-            districts, amphurs, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school, datalevel,
+            districts, amphurs, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school, school_type, datalevel,
             dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, formattedDate, code_branch, databd, file_idcard, file_gpa], (err, results) => {
                 if (err) {
                     console.error('Error inserting register exam:', err);
@@ -514,7 +514,9 @@ register_exam_router.post('/generate-qr', async (req, res) => {
         } = req.body;
 
 
-
+        console.log('--- ❗️ QR Code DEBUG ❗️ ---');
+        console.log('Received raw body:', JSON.stringify(req.body, null, 2));
+        console.log('---------------------------');
 
         const dataToSend = new URLSearchParams(); // GBPrimePay รับ Content-Type 'x-www-form-urlencoded'
         dataToSend.append('token', 'KeNIJ50Gg0FL7lALnLRaHeGpGZZug/fubn1OhCcnHd7v+QFLGkklaNdE3M6jnUn9HikOt11vRiHQ3KeCxKJvWW7mlbNAotkgwCOqfUTVYIyac10zHuYUIX8YwPLtTg+TiBUyizWpUwXCQcz2NdYjEKWTlno=');
@@ -529,7 +531,9 @@ register_exam_router.post('/generate-qr', async (req, res) => {
         dataToSend.append('merchantDefined1', merchantDefined1);
         dataToSend.append('merchantDefined2', merchantDefined2);
 
-
+    
+        console.log('Received raw body:', JSON.stringify(req.body, null, 2));
+ 
         const gbResponse = await axios.post(
             'https://api.gbprimepay.com/v3/qrcode',
             dataToSend,
