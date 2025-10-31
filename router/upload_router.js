@@ -35,14 +35,25 @@ const storageProfileImage = multer.diskStorage({
 });
 
 
+// const storageFile = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         cb(null, fileUploadDir);
+//     },
+//     filename: function (req, file, cb) {
+//         const ext = path.extname(file.originalname);
+//         const basename = path.basename(file.originalname, ext);
+//         cb(null, Date.now() + '-' + basename + ext);
+//     }
+// });
+
+
 const storageFile = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, fileUploadDir);
     },
     filename: function (req, file, cb) {
-        const ext = path.extname(file.originalname);
-        const basename = path.basename(file.originalname, ext);
-        cb(null, Date.now() + '-' + basename + ext);
+        // ใช้ชื่อไฟล์ที่ Flutter ส่งมาเลย
+        cb(null, file.originalname);
     }
 });
 
