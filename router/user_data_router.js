@@ -164,7 +164,7 @@ user_data_router.post('/login', (req, res) => {
 //Get Profile Route (Always Fetch Fresh Data)
 user_data_router.get('/get_profile', verifyToken, (req, res) => {
     const userId = req.user.userId; // Extract userId from token
-
+    
     const get_profile_query = `
     SELECT 
     users.user_email, 
@@ -176,6 +176,7 @@ user_data_router.get('/get_profile', verifyToken, (req, res) => {
     mod_customer.id_customer,
     mod_customer.id_google,
 
+     
     user_address.address,
     user_address.district, 
     user_address.postcode,

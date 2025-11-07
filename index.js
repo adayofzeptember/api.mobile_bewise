@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const upload_router = require('./router/upload_router');
 const user_data_router = require('./router/user_data_router');
+const fcm_router = require('./router/fcm');
 const register_exam_router = require('./router/register_exam');
 const log_error = require('./functions/log_error');
 require('dotenv').config(); 
@@ -9,21 +10,16 @@ require('dotenv').config();
 dotenv.config();
 const app = express();
 const onPort = process.env.PORT || 3000;
-// 1. สำหรับแปลภาษา JSON (ที่คุณใช้กับ QR Code)
 app.use(express.json()); 
 
-// 2. สำหรับแปลภาษา Form (ที่คุณใช้กับ TikTok Pay)
+
+
 app.use(express.urlencoded({ extended: true }));
- 
 app.use('/userinfo', user_data_router);
 app.use('/exam_register', register_exam_router);
-
-
 app.use('/upload', upload_router);
+app.use('/fcm', fcm_router);
 app.use('/uploads', express.static('/newdata/vhosts/bewise-global.com/httpdocs/uploads'));
-
-//app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
 
 app.use((err, req, res, next) => {
   log_error.error(`🔥 API Error: ${err.stack || err}`);
@@ -49,6 +45,7 @@ process.on("unhandledRejection", (reason, promise) => {
 app.listen(onPort, () => {
   console.log('🚀 Server is running on port ' + onPort);
 });
+
 
 
 
