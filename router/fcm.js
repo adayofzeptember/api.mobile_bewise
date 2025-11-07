@@ -34,8 +34,8 @@ router.post("/send", async (req, res) => {
     };
     try {
         const response = await admin.messaging().send(message);
-        console.log("✅ Notification sent:", response);
-        res.json({ success: true, message: "Notification sent successfully!" });
+    
+        res.json({ success: true, message: "notification sent" });
     } catch (error) {
         console.error("❌ Error sending message:", error);
         res.status(500).json({ success: false, error: error.message });
