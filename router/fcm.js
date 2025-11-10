@@ -51,11 +51,63 @@ router.post("/send", async (req, res) => {
 //     res.status(200).json({ success: true});
 // });
 
+// router.post("/insert_token", async (req, res) => {
+//   try {
+//     const { token, id } = req.body;
+
+//     // ไม่ทำอะไรถ้า token เป็น null หรือ "null"
+//     if (!token || token === "null") {
+//       return res.status(400).json({
+//         message: "⚠️ Token เป็น null หรือว่าง ไม่สามารถ insert ได้",
+//       });
+//     }
+
+//     const query = `
+//       INSERT INTO fcm_token (id_customer, device_token, update_time)
+//       VALUES (?, ?, NOW())
+//       ON DUPLICATE KEY UPDATE update_time = NOW();
+//     `;
+
+//     db_bewsie.query(query, [id, token], (err, result) => {
+//       if (err) {
+//         console.error("❌ Error inserting/updating token:", err);
+//         return res.status(500).json({
+//           message: "Database error",
+//           error: err,
+//         });
+//       }
+
+//       if (result.affectedRows === 1) {
+//         // Insert ใหม่
+//         return res.status(200).json({
+//           message: "✅ เก็บ token ใหม่แล้ว",
+//         });
+//       } else if (result.affectedRows === 2) {
+//         // token ซ้ำ → update update_time
+//         return res.status(200).json({
+//           message: "♻️ Token มีอยู่แล้ว อัปเดต update_time เรียบร้อย",
+//         });
+//       } else {
+//         return res.status(200).json({
+//           message: "ℹ️ ไม่มีการเปลี่ยนแปลง",
+//         });
+//       }
+//     });
+//   } catch (error) {
+//     console.error("❌ Unexpected error:", error);
+//     return res.status(500).json({
+//       message: "Internal server error",
+//       error,
+//     });
+//   }
+// });
+
+
 router.post("/insert_token", async (req, res) => {
   try {
     const { token, id } = req.body;
 
-    // ไม่ทำอะไรถ้า token เป็น null หรือ "null"
+    // ไม่ insert ถ้า token เป็น null หรือ "null"
     if (!token || token === "null") {
       return res.status(400).json({
         message: "⚠️ Token เป็น null หรือว่าง ไม่สามารถ insert ได้",
@@ -83,9 +135,9 @@ router.post("/insert_token", async (req, res) => {
           message: "✅ เก็บ token ใหม่แล้ว",
         });
       } else if (result.affectedRows === 2) {
-        // token ซ้ำ → update update_time
+        // token + id ซ้ำ → update update_time
         return res.status(200).json({
-          message: "♻️ Token มีอยู่แล้ว อัปเดต update_time เรียบร้อย",
+          message: "♻️ Token มีอยู่แล้วสำหรับ id นี้ อัปเดต update_time เรียบร้อย",
         });
       } else {
         return res.status(200).json({
@@ -101,6 +153,7 @@ router.post("/insert_token", async (req, res) => {
     });
   }
 });
+
 
 router.post("/getToken", async (req, res) => {
   try {
@@ -120,7 +173,7 @@ router.post("/getToken", async (req, res) => {
         console.error("❌ Error writing token:", err);
         return res.status(500).json({ success: false, message: "Failed to save token" });
       }
- 
+
       res.status(200).json({ success: true, message: "Token saved successfully" });
     });
   } catch (error) {
