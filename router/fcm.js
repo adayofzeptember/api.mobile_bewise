@@ -63,7 +63,7 @@ router.post("/insert_token", async (req, res) => {
     }
 
     const query = `
-      INSERT INTO fcm_token (id_customer, fcm_token, update_time)
+      INSERT INTO fcm_token (id_customer, device_token, update_time)
       VALUES (?, ?, NOW())
       ON DUPLICATE KEY UPDATE update_time = NOW();
     `;
