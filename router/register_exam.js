@@ -2,9 +2,8 @@ const express = require('express');
 const db_bewsie = require('../db/db_bewise');
 const register_exam_router = express.Router();
 const verifyToken = require('../functions/auth');
-
 const axios = require('axios');
-require('dotenv').config(); // โหลดตัวแปรจากไฟล์ .env
+require('dotenv').config(); // โหลดตัวแปรจากไฟล์ . env
 
 register_exam_router.post('/register', verifyToken, async (req, res) => {
     const { format, constructFrom } = require('date-fns');
@@ -157,7 +156,6 @@ register_exam_router.put('/Update_Docs/:check', verifyToken, (req, res) => {
 
     });
 });
-
 
 register_exam_router.post('/insert_payment/:id', verifyToken, (req, res) => {
     //! insert ลง table การชำระเงิน
@@ -355,7 +353,6 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
     }
 });
 
-
 register_exam_router.put('/update_idcard_std', verifyToken, (req, res) => {
     //! อัปเดทรหัส นร ไปยัง data 
     const userId = req.user.userId;
@@ -474,7 +471,6 @@ register_exam_router.get('/gbpayCheck', verifyToken, (req, res) => {
 
 });
 
-
 register_exam_router.put('/update_idcard_afterRegis', verifyToken, (req, res) => {
     //! อัปเดทรหัส นร ไปยัง data 
     const userId = req.user.userId;
@@ -498,7 +494,6 @@ register_exam_router.put('/update_idcard_afterRegis', verifyToken, (req, res) =>
         });
     });
 });
-
 
 register_exam_router.post('/generate-qr', async (req, res) => {
     try {
@@ -563,7 +558,6 @@ register_exam_router.post('/generate-qr', async (req, res) => {
     }
 });
 
-
 register_exam_router.post('/favorite', verifyToken, (req, res) => {
     const userId = req.user.userId;
     const { fav } = req.body;
@@ -605,8 +599,6 @@ register_exam_router.post('/favorite', verifyToken, (req, res) => {
         });
     });
 });
-
-
 
 register_exam_router.get('/favorite', verifyToken, (req, res) => {
     const userId = req.user.userId;
@@ -659,9 +651,6 @@ register_exam_router.delete('/favorite/:id', verifyToken, (req, res) => {
     });
 });
 
-
-
-
 register_exam_router.get('/zoom', verifyToken, (req, res) => {
 
     const get_zoomq = 'SELECT * FROM zoom_table';
@@ -713,9 +702,6 @@ register_exam_router.get('/zoom', verifyToken, (req, res) => {
 
 
 });
-
-
-
 
 register_exam_router.post('/tiktok-pay', async (req, res) => {
     try {
