@@ -77,17 +77,44 @@ router.post("/noti_payment", async (req, res) => {
     }
 
     const deviceTokensList = results.map(row => row.device_token);
-    res.json({
-      deviceTokensList
-    });
-    try {
 
+    try {
       const response = await sendNotificationToMany(deviceTokensList, 'ชำระเงินค่าสมัครสอบ', 'ผู้สมัครยังไม่ได้ชำระเงินค่าสมัครสอบ');
       res.json({
         success: true,
 
         sent: response.successCount,
         failed: response.failureCount,
+      });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+});
+
+router.post("/docs", async (req, res) => {
+
+  const query = "SELECT DISTINCT f.device_token FROM fcm_token f INNER JOIN dataregister_2026_april_r4 d ON f.id_customer = d.id_customer WHERE (d.idcard_std != '' AND d.idcard_std IS NOT NULL) AND NOT (d.status_file_id = 'doc_correct' AND d.status_file_gpa = 'doc_correct');";
+
+  db_bewsie.query(query, async (err, results) => {
+
+    if (err) {
+      console.error("Database query error:", err);
+      return res.status(500).json({
+        success: false,
+        message: "Database query failed",
+        error: err.message
+      });
+    }
+
+    const deviceTokensList = results.map(row => row.device_token);
+
+    try {
+      //const response = await sendNotificationToMany(deviceTokensList, 'ชำระเงินค่าสมัครสอบ', 'ผู้สมัครยังไม่ได้ชำระเงินค่าสมัครสอบ');
+      res.json({
+        success: true,
+        deviceTokensList
+ 
       });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });

@@ -36,19 +36,38 @@ async function sendPaymentReminder() {
         }
     });
 }
+//*
+async function sendDocsNoti() {
+    const query = "SELECT DISTINCT f.device_token FROM fcm_token f INNER JOIN dataregister_2026_april_r4 d ON f.id_customer = d.id_customer WHERE (d.idcard_std != '' AND d.idcard_std IS NOT NULL) AND NOT (d.status_file_id = 'doc_correct' AND d.status_file_gpa = 'doc_correct');";
 
 
-// function startCron() {
-//     cron.schedule('* * * * *', () => {
-//         sendPaymentReminder();
-//     });
+    db_bewsie.query(query, async (err, results) => {
+        if (err) {
+            console.error("Database query error:", err);
+            return;
+        }
 
-//     //   cron.schedule('0 */2 * * *', async () => {
-//     //     console.log('📨 ตรวจสอบผู้ยังไม่ส่งเอกสาร...');
-//     //     await sendDocsReminder();
-//     //   });
+        const deviceTokensList = results.map(row => row.device_token);
+        if (deviceTokensList.length === 0) {
 
-// }
+            return;
+        }
+
+        try {
+            const response = await sendNotificationToMany(
+                deviceTokensList,
+                'เอกสาร',
+                'ผู้สมัครยังไม่ได้ชำระเงินค่าสมัครสอบ'
+            );
+            // console.log(`ส่งแจ้งเตือนเรียบร้อย: ${response.successCount} สำเร็จ, ${response.failureCount} ล้มเหลว`);
+        } catch (error) {
+            console.error("Error sending notification:", error.message);
+        }
+    });
+}
+
+
+
 
 function startCron() {
     // รันทุก 1 นาที
