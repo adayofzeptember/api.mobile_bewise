@@ -77,13 +77,15 @@ router.post("/noti_payment", async (req, res) => {
     }
 
     const deviceTokensList = results.map(row => row.device_token);
-
+    res.json({
+      deviceTokensList
+    });
     try {
-      
+
       const response = await sendNotificationToMany(deviceTokensList, 'ชำระเงินค่าสมัครสอบ', 'ผู้สมัครยังไม่ได้ชำระเงินค่าสมัครสอบ');
       res.json({
         success: true,
-        deviceTokensList,
+
         sent: response.successCount,
         failed: response.failureCount,
       });
