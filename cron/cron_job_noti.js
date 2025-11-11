@@ -1,7 +1,7 @@
 // noti_payment_cron.js
 const cron = require('node-cron');
 const db_bewsie = require('../db/db_bewise'); // ไฟล์ DB ของคุณ
-const { sendNotification, sendNotificationToMany } = require('../functions/notiSend_function'); // ฟังชั่นส่ง FCM
+const { sendNotificationToMany } = require('../functions/notiSend_function'); // ฟังชั่นส่ง FCM
 
 async function sendPaymentReminder() {
     const query = `
@@ -37,13 +37,27 @@ async function sendPaymentReminder() {
     });
 }
 
-// ตั้ง cron ให้รันทุก 1 นาที
+
+// function startCron() {
+//     cron.schedule('* * * * *', () => {
+//         sendPaymentReminder();
+//     });
+
+//     //   cron.schedule('0 */2 * * *', async () => {
+//     //     console.log('📨 ตรวจสอบผู้ยังไม่ส่งเอกสาร...');
+//     //     await sendDocsReminder();
+//     //   });
+
+// }
+
 function startCron() {
-    cron.schedule('* * * * *', () => {
-     
-        sendPaymentReminder();
+    // รันทุก 1 นาที
+    cron.schedule('* * * * *', async () => {
+        try {
+            await sendPaymentReminder();
+        } catch (error) {
+            console.error('❌ เกิดข้อผิดพลาดใน cron sendPaymentReminder:', error);
+        }
     });
-
-
 }
 module.exports = { startCron, sendPaymentReminder };

@@ -49,7 +49,7 @@ app.listen(onPort, () => {
 });
 
 
-startCron();
+//startCron();
 
 
 //  data.datetime = {

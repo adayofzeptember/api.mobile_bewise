@@ -34,7 +34,7 @@ router.post("/send", async (req, res) => {
 });
 
 
-router.post("/send_all", async (req, res) => {
+router.post("/boardcast", async (req, res) => {
   const { title, body } = req.body;
   const query = "SELECT device_token FROM fcm_token";
 
@@ -79,17 +79,17 @@ router.post("/noti_payment", async (req, res) => {
     const deviceTokensList = results.map(row => row.device_token);
 
     try {
+      
       const response = await sendNotificationToMany(deviceTokensList, 'ชำระเงินค่าสมัครสอบ', 'ผู้สมัครยังไม่ได้ชำระเงินค่าสมัครสอบ');
       res.json({
         success: true,
+        deviceTokensList,
         sent: response.successCount,
         failed: response.failureCount,
       });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
     }
-
-
   });
 });
 
