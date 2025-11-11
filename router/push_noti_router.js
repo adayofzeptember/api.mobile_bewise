@@ -3,111 +3,100 @@ const admin = require("firebase-admin");
 const fs = require("fs");
 const router = express.Router();
 const db_bewsie = require('../db/db_bewise');
+const { sendNotification, sendNotificationToMany } = require("../functions/notiSend_function");
 
 // ✅ โหลด service account key
 const serviceAccount = JSON.parse(
   fs.readFileSync("./serviceAccountKey.json", "utf-8")
 );
 
-
-
-// ✅ ป้องกัน initialize ซ้ำ
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
   });
 }
 
-// ✅ ฟังก์ชันยิงแจ้งเตือน
+
+
 router.post("/send", async (req, res) => {
   const { token, title, body } = req.body;
 
-  if (!title || !body) {
-    return res.status(400).json({ error: "Missing token, title, or body" });
-  }
-  const message = {
-    token: token,
-    notification: {
-      title: title,
-      body: body,
-    },
-    android: {
-      priority: "high",
-    },
-  };
   try {
-    const response = await admin.messaging().send(message);
-
-    res.json({ success: true, message: "notification sent" });
+    const result = await sendNotification(token, title, body);
+    if (result.success) {
+      res.json({ success: true, message: "notification sent" });
+    } else {
+      res.status(500).json({ success: false, error: result.error });
+    }
   } catch (error) {
-    console.error("❌ Error sending message:", error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(400).json({ success: false, error: error.message });
   }
 });
 
-// router.post("/getToken", async (req, res) => {
-//     const { token } = req.body;
-//     console.log(token);
-//     res.status(200).json({ success: true});
-// });
 
-// router.post("/insert_token", async (req, res) => {
-//   try {
-//     const { token, id } = req.body;
+router.post("/send_all", async (req, res) => {
+  const { title, body } = req.body;
+  const query = "SELECT device_token FROM fcm_token";
 
-//     // ไม่ทำอะไรถ้า token เป็น null หรือ "null"
-//     if (!token || token === "null") {
-//       return res.status(400).json({
-//         message: "⚠️ Token เป็น null หรือว่าง ไม่สามารถ insert ได้",
-//       });
-//     }
+  db_bewsie.query(query, async (err, results) => {
+    if (err) return res.status(500).json({ success: false, error: err.message });
 
-//     const query = `
-//       INSERT INTO fcm_token (id_customer, device_token, update_time)
-//       VALUES (?, ?, NOW())
-//       ON DUPLICATE KEY UPDATE update_time = NOW();
-//     `;
 
-//     db_bewsie.query(query, [id, token], (err, result) => {
-//       if (err) {
-//         console.error("❌ Error inserting/updating token:", err);
-//         return res.status(500).json({
-//           message: "Database error",
-//           error: err,
-//         });
-//       }
+    const tokens = results.map(r => r.device_token);
+    // console.log("Tokens to send:", tokens);
+    if (tokens.length === 0) return res.status(404).json({ success: false, message: "No tokens found" });
 
-//       if (result.affectedRows === 1) {
-//         // Insert ใหม่
-//         return res.status(200).json({
-//           message: "✅ เก็บ token ใหม่แล้ว",
-//         });
-//       } else if (result.affectedRows === 2) {
-//         // token ซ้ำ → update update_time
-//         return res.status(200).json({
-//           message: "♻️ Token มีอยู่แล้ว อัปเดต update_time เรียบร้อย",
-//         });
-//       } else {
-//         return res.status(200).json({
-//           message: "ℹ️ ไม่มีการเปลี่ยนแปลง",
-//         });
-//       }
-//     });
-//   } catch (error) {
-//     console.error("❌ Unexpected error:", error);
-//     return res.status(500).json({
-//       message: "Internal server error",
-//       error,
-//     });
-//   }
-// });
+    try {
+      const response = await sendNotificationToMany(tokens, title, body);
+      res.json({
+        success: true,
+        sent: response.successCount,
+        failed: response.failureCount,
+      });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+});
 
+
+
+router.post("/noti_payment", async (req, res) => {
+
+  const query = "SELECT DISTINCT f.device_token FROM fcm_token f INNER JOIN dataregister_2026_april_r4 d ON f.id_customer = d.id_customer WHERE TRIM(d.idcard_std) = ''";
+
+  db_bewsie.query(query, async (err, results) => {
+
+    if (err) {
+      console.error("Database query error:", err);
+      return res.status(500).json({
+        success: false,
+        message: "Database query failed",
+        error: err.message
+      });
+    }
+
+    const deviceTokensList = results.map(row => row.device_token);
+
+    try {
+      const response = await sendNotificationToMany(deviceTokensList, 'ชำระเงินค่าสมัครสอบ', 'ผู้สมัครยังไม่ได้ชำระเงินค่าสมัครสอบ');
+      res.json({
+        success: true,
+        sent: response.successCount,
+        failed: response.failureCount,
+      });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+
+
+  });
+});
 
 router.post("/insert_token", async (req, res) => {
   try {
     const { token, id } = req.body;
 
-    // ไม่ insert ถ้า token เป็น null หรือ "null"
     if (!token || token === "null") {
       return res.status(400).json({
         message: "⚠️ Token เป็น null หรือว่าง ไม่สามารถ insert ได้",
@@ -130,12 +119,10 @@ router.post("/insert_token", async (req, res) => {
       }
 
       if (result.affectedRows === 1) {
-        // Insert ใหม่
         return res.status(200).json({
           message: "✅ เก็บ token ใหม่แล้ว",
         });
       } else if (result.affectedRows === 2) {
-        // token + id ซ้ำ → update update_time
         return res.status(200).json({
           message: "♻️ Token มีอยู่แล้วสำหรับ id นี้ อัปเดต update_time เรียบร้อย",
         });
