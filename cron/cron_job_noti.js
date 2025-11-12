@@ -66,10 +66,11 @@ async function sendDocsNoti() {
 
 
 
+//cron.schedule('0 10,19 * * *', async () => {
 
 function startCron() {
     // รันทุก 1 นาที
-    cron.schedule('* * * * *', async () => {
+    cron.schedule('0 10,19 * * *', async () => {
         try {
             await sendPaymentReminder();
         } catch (error) {
@@ -77,7 +78,7 @@ function startCron() {
         }
     });
 
-    cron.schedule('* * * * *', async () => {
+    cron.schedule('0 10,19 * * *', async () => {
         try {
             await sendDocsNoti();
         } catch (error) {

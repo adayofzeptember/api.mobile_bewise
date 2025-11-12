@@ -67,6 +67,7 @@ async function sendNotificationToMany(tokens, title, body) {
     throw new Error("No tokens provided");
   }
 
+
   const CHUNK_SIZE = 400; 
   let successCount = 0;
   let failureCount = 0;
