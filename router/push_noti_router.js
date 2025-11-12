@@ -93,8 +93,8 @@ router.post("/noti_payment", async (req, res) => {
 });
 
 router.post("/docs", async (req, res) => {
-
-  const query = "SELECT DISTINCT f.device_token FROM fcm_token f INNER JOIN dataregister_2026_april_r4 d ON f.id_customer = d.id_customer WHERE (d.idcard_std != '' AND d.idcard_std IS NOT NULL) AND NOT (d.status_file_id = 'doc_correct' AND d.status_file_gpa = 'doc_correct');";
+  //const query = "SELECT DISTINCT f.device_token FROM fcm_token f INNER JOIN dataregister_2026_april_r4 d ON f.id_customer = d.id_customer WHERE (d.idcard_std != '' AND d.idcard_std IS NOT NULL) AND NOT (d.status_file_id = 'doc_correct' AND d.status_file_gpa = 'doc_correct');";
+  const query = "SELECT DISTINCT f.device_token FROM fcm_token f INNER JOIN dataregister_2026_april_r4 d ON f.id_customer = d.id_customer WHERE (d.idcard_std != '' AND d.idcard_std IS NOT NULL) AND NOT (d.status_file_id = 'doc_correct' AND d.status_file_gpa = 'doc_correct') AND NOT ( d.file_idcard != '' AND d.file_gpa != '' AND d.status_file_id = '' AND d.status_file_gpa = '' );";
 
   db_bewsie.query(query, async (err, results) => {
 
@@ -110,7 +110,7 @@ router.post("/docs", async (req, res) => {
     const deviceTokensList = results.map(row => row.device_token);
 
     try {
-      //const response = await sendNotificationToMany(deviceTokensList, 'ชำระเงินค่าสมัครสอบ', 'ผู้สมัครยังไม่ได้ชำระเงินค่าสมัครสอบ');
+      const response = await sendNotificationToMany(deviceTokensList, 'แจ้งเตือนส่งเอกสาร', 'เอกสารของผู้สมัครยังไม่ครบถ้วน');
       res.json({
         success: true,
         deviceTokensList

@@ -27,7 +27,7 @@ async function sendPaymentReminder() {
         try {
             const response = await sendNotificationToMany(
                 deviceTokensList,
-                'ชำระเงินค่าสมัครสอบ',
+                'แจ้งเตือนชำระเงินค่าสมัครสอบ',
                 'ผู้สมัครยังไม่ได้ชำระเงินค่าสมัครสอบ'
             );
             // console.log(`ส่งแจ้งเตือนเรียบร้อย: ${response.successCount} สำเร็จ, ${response.failureCount} ล้มเหลว`);
@@ -38,7 +38,7 @@ async function sendPaymentReminder() {
 }
 //*
 async function sendDocsNoti() {
-    const query = "SELECT DISTINCT f.device_token FROM fcm_token f INNER JOIN dataregister_2026_april_r4 d ON f.id_customer = d.id_customer WHERE (d.idcard_std != '' AND d.idcard_std IS NOT NULL) AND NOT (d.status_file_id = 'doc_correct' AND d.status_file_gpa = 'doc_correct');";
+    const query = "SELECT DISTINCT f.device_token FROM fcm_token f INNER JOIN dataregister_2026_april_r4 d ON f.id_customer = d.id_customer WHERE (d.idcard_std != '' AND d.idcard_std IS NOT NULL) AND NOT (d.status_file_id = 'doc_correct' AND d.status_file_gpa = 'doc_correct') AND NOT ( d.file_idcard != '' AND d.file_gpa != '' AND d.status_file_id = '' AND d.status_file_gpa = '' );";
 
 
     db_bewsie.query(query, async (err, results) => {
@@ -49,15 +49,13 @@ async function sendDocsNoti() {
 
         const deviceTokensList = results.map(row => row.device_token);
         if (deviceTokensList.length === 0) {
-
             return;
         }
 
         try {
             const response = await sendNotificationToMany(
                 deviceTokensList,
-                'เอกสาร',
-                'ผู้สมัครยังไม่ได้ชำระเงินค่าสมัครสอบ'
+                'แจ้งเตือนส่งเอกสาร', 'เอกสารของผู้สมัครยังไม่ครบถ้วน'
             );
             // console.log(`ส่งแจ้งเตือนเรียบร้อย: ${response.successCount} สำเร็จ, ${response.failureCount} ล้มเหลว`);
         } catch (error) {
@@ -76,6 +74,14 @@ function startCron() {
             await sendPaymentReminder();
         } catch (error) {
             console.error('❌ เกิดข้อผิดพลาดใน cron sendPaymentReminder:', error);
+        }
+    });
+
+    cron.schedule('* * * * *', async () => {
+        try {
+            await sendDocsNoti();
+        } catch (error) {
+            console.error('❌ เกิดข้อผิดพลาดใน cron sendDocsNoti:', error);
         }
     });
 }
