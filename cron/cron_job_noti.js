@@ -28,7 +28,7 @@ async function sendPaymentReminder() {
             const response = await sendNotificationToMany(
                 deviceTokensList,
                 'แจ้งเตือนชำระเงินค่าสมัครสอบ',
-                'ผู้สมัครยังไม่ได้ชำระเงินค่าสมัครสอบ'
+                'การสมัครสอบยังไม่สมบูรณ์ กรุณาชำระเงินค่าสมัครสอบ'
             );
             // console.log(`ส่งแจ้งเตือนเรียบร้อย: ${response.successCount} สำเร็จ, ${response.failureCount} ล้มเหลว`);
         } catch (error) {
@@ -55,7 +55,7 @@ async function sendDocsNoti() {
         try {
             const response = await sendNotificationToMany(
                 deviceTokensList,
-                'แจ้งเตือนส่งเอกสาร', 'เอกสารของผู้สมัครยังไม่ครบถ้วน'
+                'เอกสารไม่ครบถ้วน', 'เอกสารสมัครสอบของนักเรียนยังไม่ครบถ้วน กรุณาตรวจสอบและอัปโหลดเอกสาร'
             );
             // console.log(`ส่งแจ้งเตือนเรียบร้อย: ${response.successCount} สำเร็จ, ${response.failureCount} ล้มเหลว`);
         } catch (error) {
@@ -66,24 +66,26 @@ async function sendDocsNoti() {
 
 
 
-//cron.schedule('0 10,19 * * *', async () => {
-
 function startCron() {
-    // รันทุก 1 นาที
-    cron.schedule('0 10,19 * * *', async () => {
+    // รันทุกวันเวลา 15:00 (บ่าย 3 โมง)
+    cron.schedule('0 15 * * *', async () => {
         try {
             await sendPaymentReminder();
         } catch (error) {
             console.error('❌ เกิดข้อผิดพลาดใน cron sendPaymentReminder:', error);
         }
+    }, {
+        timezone: "Asia/Bangkok"
     });
 
-    cron.schedule('0 10,19 * * *', async () => {
+    cron.schedule('0 15 * * *', async () => {
         try {
             await sendDocsNoti();
         } catch (error) {
             console.error('❌ เกิดข้อผิดพลาดใน cron sendDocsNoti:', error);
         }
+    }, {
+        timezone: "Asia/Bangkok"
     });
 }
 module.exports = { startCron, sendPaymentReminder };
