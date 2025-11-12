@@ -67,8 +67,8 @@ async function sendDocsNoti() {
 
 
 function startCron() {
-    // รันทุกวันเวลา 15:00 (บ่าย 3 โมง)
-    cron.schedule('0 15 * * *', async () => {
+ 
+    cron.schedule('0 10,15,19 * * *', async () => {
         try {
             await sendPaymentReminder();
         } catch (error) {
@@ -78,7 +78,7 @@ function startCron() {
         timezone: "Asia/Bangkok"
     });
 
-    cron.schedule('0 15 * * *', async () => {
+    cron.schedule('0 10,15,19 * * *', async () => {
         try {
             await sendDocsNoti();
         } catch (error) {
