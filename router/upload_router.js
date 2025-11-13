@@ -60,13 +60,13 @@ const storageFile = multer.diskStorage({
 // Upload middlewares
 const uploadImage = multer({
     storage: storageProfileImage,
-    limits: { fileSize: 2 * 1024 * 1024 },
+    limits: { fileSize: 5 * 1024 * 1024 },
     // fileFilter: imageOnlyFilter,   //? เาอออกได้
 });
 
 const uploadFile = multer({
     storage: storageFile,
-    limits: { fileSize: 2 * 1024 * 1024 },
+    limits: { fileSize: 5 * 1024 * 1024 },
     //fileFilter: imageAndPdfFilter,
 });
 
