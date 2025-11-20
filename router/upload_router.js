@@ -157,7 +157,6 @@ upload_router.post('/upload_file', verifyToken, uploadFile.single('file'), (req,
     const filename = path.basename(filePath);
 
 
-
     res.json({
         message: "ไฟล์ถูกอัปโหลดแล้ว",
         file: {
@@ -169,9 +168,12 @@ upload_router.post('/upload_file', verifyToken, uploadFile.single('file'), (req,
                 dir: directory,
                 name: filename
             }
+
         },
     });
 });
+
+
 
 //? 
 //*

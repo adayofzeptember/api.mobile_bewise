@@ -40,12 +40,15 @@ async function sendPaymentReminder() {
 async function sendDocsNoti() {
     const query = "SELECT DISTINCT f.device_token FROM fcm_token f INNER JOIN dataregister_2026_april_r4 d ON f.id_customer = d.id_customer WHERE (d.idcard_std != '' AND d.idcard_std IS NOT NULL) AND NOT (d.status_file_id = 'doc_correct' AND d.status_file_gpa = 'doc_correct') AND NOT ( d.file_idcard != '' AND d.file_gpa != '' AND d.status_file_id = '' AND d.status_file_gpa = '' );";
 
-
     db_bewsie.query(query, async (err, results) => {
         if (err) {
             console.error("Database query error:", err);
             return;
         }
+
+
+
+
 
         const deviceTokensList = results.map(row => row.device_token);
         if (deviceTokensList.length === 0) {
@@ -65,8 +68,8 @@ async function sendDocsNoti() {
 }
 
 
+
 function startCron() {
- 
     cron.schedule('0 10,15,19 * * *', async () => {
         try {
             await sendPaymentReminder();
@@ -74,6 +77,7 @@ function startCron() {
             console.error('❌ เกิดข้อผิดพลาดใน cron sendPaymentReminder:', error);
         }
     }, {
+
         timezone: "Asia/Bangkok"
     });
 
@@ -87,4 +91,5 @@ function startCron() {
         timezone: "Asia/Bangkok"
     });
 }
+
 module.exports = { startCron, sendPaymentReminder };

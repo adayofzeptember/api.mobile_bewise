@@ -79,8 +79,8 @@ user_data_router.post('/register', async (req, res) => {
                 }
 
                 const insert_mod_customer_query = `INSERT INTO mod_customer
-                (id_customer, forename, surename, user_email, create_id, create_datetime) 
-                VALUES (?, ?, ?, ?, ?, ?)`;
+                (id_customer, forename, surename, user_email, create_id, create_datetime, user_email_verify) 
+                VALUES (?, ?, ?, ?, ?, ?, 1)`;
 
                 db_bewsie.query(insert_mod_customer_query, [random_for_id_data_role, firstname, lastname, email, random_for_id_data_role, formattedDate], (err, results) => {
                     if (err) {
