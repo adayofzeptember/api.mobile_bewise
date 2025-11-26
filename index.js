@@ -5,15 +5,14 @@ const user_data_router = require('./router/user_data_router');
 const fcm_router = require('./router/push_noti_router');
 const register_exam_router = require('./router/register_exam');
 const log_error = require('./functions/log_error');
-const { startCron } = require('./cron/cron_job_noti');  
+const { startCron } = require('./cron/cron_job_noti');
 
-require('dotenv').config(); 
-
+require('dotenv').config();
 dotenv.config();
 const app = express();
 const onPort = process.env.PORT || 3000;
-app.use(express.json()); 
 
+app.use(express.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/userinfo', user_data_router);
@@ -47,12 +46,10 @@ app.listen(onPort, () => {
 });
 
 //startCron();
+
 //  data.datetime = {
 //           date: '12 ตุลาคม 2568',
 //           time: '12.00 - 14.30 น.'
 //       };
-
-
-
-
-
+//              const targetDay = 25;
+//              const targetMonth = 11;

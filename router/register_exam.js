@@ -191,6 +191,19 @@ register_exam_router.post('/insert_payment/:id', verifyToken, (req, res) => {
     });
 });
 
+register_exam_router.get('/news', (req, res) => {
+
+    const news_get = 'SELECT * FROM banner_news';
+    db_bewsie.query(news_get, (err, results) => {
+        if (err) {
+            return res.status(400).json({ error: err.message });
+        }
+        return res.status(200).json(results[0]);
+
+    });
+
+});
+
 register_exam_router.get('/check_register', verifyToken, (req, res) => {
     const userId = req.user.userId;
     const queryCheckRegis = 'SELECT * FROM dataregister_2026_april_r4 WHERE id_customer = ?';
@@ -204,11 +217,12 @@ register_exam_router.get('/check_register', verifyToken, (req, res) => {
 
 });
 
+
 register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
     const check = req.params.type_check;
-    const userId = req.user.userId;// Extract userId from token
+    const userId = req.user.userId;
 
-    //! เช็ค docs
+    //! เช็ค docs remove GPA
     if (check == 'docs') {
         const queryCheckDocs = 'SELECT file_idcard, status_file_id ,status_file_gpa,  file_gpa, remark_file_id, remark_file_gpa FROM dataregister_2026_april_r4 WHERE id_customer = ?';
 
@@ -224,96 +238,45 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
 
             else {
                 const idcard = results[0].file_idcard;
-                const gpa = results[0].file_gpa;
-
-                const statusGpa = results[0].status_file_gpa;
                 const statusID = results[0].status_file_id;
-                const remarkGPA = results[0].remark_file_gpa;
                 const remarkID = results[0].remark_file_id;
 
-                if (!idcard && !gpa) {
+                if (!idcard) {
                     return res.status(200).json({
-                        message: 'ยังไม่อัปโหลดบัตรประชาชนและผลการเรียน',
-                        code: "2"
-                    });
-                } else if (!idcard) {
-                    return res.status(200).json({
-                        message: 'ยังไม่อัปโหลดไฟล์บัตรประชาชน',
-                        code: "1-id"
-                    });
-                } else if (!gpa) {
-                    return res.status(200).json({
-                        message: 'ยังไม่อัปโหลดไฟล์ผลการเรียน',
-                        code: "1-gpa"
+                        code: "no_file",
+                        message: 'ยังไม่อัปโหลดสำเนาบัตรประชาชน',
                     });
                 } else {
-                    // เอกสารอัปโหลดครบ
-                    if (statusGpa == "doc_correct" && statusID == "doc_correct") {
+
+                    if (statusID == "doc_correct") {
                         return res.status(200).json({
-                            code: "0",
+                            code: "passed",
                             message: "เอกสารผ่านการตรวจสอบแล้ว",
-                            docs: [
-                                { name: "สำเนาบัตรประชาชน", status: "เอกสารผ่านเกณฑ์", remark: "" },
-                                { name: "ผลการเรียน", status: "เอกสารผ่านเกณฑ์", remark: "" },
-                            ]
+
                         });
                     }
 
-                    // ❗ ต้องเช็ก "ไม่ผ่าน" ก่อน "รอตรวจสอบ" เสมอ
-                    if (statusGpa === "doc_not_passed" || statusID === "doc_not_passed") {
+                    if (statusID === "doc_not_passed") {
                         return res.status(200).json({
                             code: "refund",
                             message: 'คุณสมบัติไม่ผ่านเกณฑ์ของโครงการ',
-                            docs: [
-                                { name: "สำเนาบัตรประชาชน", status: "x", remark: remarkID },
-                                { name: "ผลการเรียน", status: "x", remark: remarkGPA },
-                            ]
                         });
                     }
 
-                    if (statusID === "doc_incomplete" && statusGpa === "doc_incomplete") {
+                    if (statusID === "doc_incomplete") {
                         return res.status(200).json({
-                            code: "both_incomplete",
-                            message: "เอกสารไม่สมบูรณ์, อัปโหลดใหม่",
-                            docs: [
-                                { name: "สำเนาบัตรประชาชน", status: "เอกสารไม่สมบูรณ์", remark: remarkID },
-                                { name: "ผลการเรียน", status: "เอกสารไม่สมบูรณ์", remark: remarkGPA },
-                            ]
-                        });
-                    }
-
-                    if (statusGpa === "doc_incomplete" && statusID === "doc_correct") {
-                        return res.status(200).json({
-                            code: "gpa_incomplete",
-                            message: 'ผลการเรียน ไม่สมบูรณ์, อัปโหลดใหม่',
-                            docs: [
-                                { name: "สำเนาบัตรประชาชน", status: "เอกสารผ่านเกณฑ์", remark: "" },
-                                { name: "ผลการเรียน", status: "เอกสารไม่สมบูรณ์", remark: remarkGPA },
-                            ]
-                        });
-                    }
-
-                    if (statusID === "doc_incomplete" && statusGpa === "doc_correct") {
-                        return res.status(200).json({
-                            code: "id_incomplete",
+                            code: "incomplete",
                             message: 'สำเนาบัตรประชาชนไม่สมบูรณ์ ',
-                            docs: [
-                                { name: "สำเนาบัตรประชาชน", status: "เอกสารไม่สมบูรณ์", remark: remarkID },
-                                { name: "ผลการเรียน", status: "เอกสารผ่านเกณฑ์", remark: "" },
+                            remark: remarkID
 
-                            ]
                         });
                     }
 
-                    // รอตรวจสอบ
-                    if (statusID === "" || statusGpa === "") {
+                    if (statusID === "") {
                         return res.status(200).json({
-                            code: "w8",
+                            code: "wait",
                             message: 'เอกสารรอตรวจสอบ',
-                            docs: [
-                                { name: "สำเนาบัตรประชาชน", status: "รอตรวจสอบ", remark: remarkID },
-                                { name: "ผลการเรียน", status: "รอตรวจสอบ", remark: remarkGPA },
-                            ]
+
                         });
                     }
 
@@ -329,27 +292,131 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
     }
     //! เช็คว่าจะไปหน้าไหน
     else if (check == 'register') {
-        const queryCheckRegis = 'SELECT id_customer FROM dataregister_2026_april_r4 WHERE id_customer = ?';
-        db_bewsie.query(queryCheckRegis, [userId], (err, results) => {
-            // สมัครรึยีัง 
-            if (results.length == 0) {
+
+        const queryCheckRegis = `
+    SELECT id_customer 
+    FROM dataregister_2026_april_r4 
+    WHERE id_customer = ?
+`;
+
+        db_bewsie.query(queryCheckRegis, [userId], (err, regisResults) => {
+
+            // เช็คว่าลงทะเบียนหรือยัง
+            if (regisResults.length === 0) {
                 return res.status(200).json({ message: 'no-register' });
             }
-            // ถ้าสมัครแล้ว จ่ายเงินรึยัง 1. payment_screen, 2. infoCheck
-            else {
-                // ต้องเปลี่ยนตรงนรี้เพื่อ tiktok 
-                const queryCheckPay = 'SELECT idcard_std FROM data_gb_prime_pay WHERE idcard_std = ?';
-                const { idcard_std } = req.body;
-                db_bewsie.query(queryCheckPay, [idcard_std], (err, results) => {
-                    if (err) {
-                        return res.status(400).json({ error: 'เช็ค payment error ' + err.message });
-                    }
-                    else {
-                        return res.status(200).json({ length: results.length });
-                    }
+
+            // ---------- ถ้าลงทะเบียนแล้ว ----------
+
+            const queryCheckPay = `
+        SELECT idcard_std 
+        FROM data_gb_prime_pay 
+        WHERE idcard_std = ?
+    `;
+
+            const { idcard_std } = req.body;
+
+            db_bewsie.query(queryCheckPay, [idcard_std], (err, payResults) => {
+
+                if (err) {
+                    return res.status(400).json({
+                        error: 'เช็ค payment error ' + err.message
+                    });
+                }
+
+                const now = new Date();
+                const day = now.getDate();
+                const month = now.getMonth() + 1;
+
+                const targetDay = 25;
+                const targetMonth = 11;
+
+
+                if (day === targetDay && month === targetMonth) {
+
+                    const q3 = `SELECT status_file_id, status_file_gpa FROM dataregister_2026_april_r4 WHERE id_customer = ?`;
+
+                    return db_bewsie.query(q3, [userId], (err, docResults) => {
+
+                        if (err) {
+                            return res.status(400).json({
+                                error: "Database error q3: " + err.message
+                            });
+                        }
+
+                        if (docResults.length === 0) {
+                            return res.status(404).json({
+                                message: "ไม่พบข้อมูลเอกสาร"
+                            });
+                        }
+
+                        const { status_file_id, status_file_gpa } = docResults[0];
+
+                        if (status_file_id === 'doc_correct' &&
+                            status_file_gpa === 'doc_correct') {
+                            return res.status(200).json({
+                                length: 2
+                            });
+                        }
+                        //       message: "เอกสารไม่ครบ",
+                        return res.status(200).json({
+
+                            length: payResults.length
+                        });
+
+                    });
+                }
+
+                // ====== ไม่ใช่วันพิเศษ → return ปกติ ======
+                return res.status(200).json({
+                    length: payResults.length
                 });
-            }
+
+            });
         });
+
+        // const queryCheckRegis = 'SELECT id_customer FROM dataregister_2026_april_r4 WHERE id_customer = ?';
+        // db_bewsie.query(queryCheckRegis, [userId], (err, results) => {
+        //     // สมัครรึยีัง 
+        //     if (results.length == 0) {
+        //         return res.status(200).json({ message: 'no-register' });
+        //     }
+        //     // ถ้าสมัครแล้ว จ่ายเงินรึยัง 1. payment_screen, 2. infoCheck
+        //     else {
+        //         // ต้องเปลี่ยนตรงนรี้เพื่อ tiktok 
+        //         const queryCheckPay = 'SELECT idcard_std FROM data_gb_prime_pay WHERE idcard_std = ?';
+        //         const { idcard_std } = req.body;
+        //         db_bewsie.query(queryCheckPay, [idcard_std], (err, results) => {
+        //             console.log(results.length);
+
+        //             if (err) {
+        //                 return res.status(400).json({ error: 'เช็ค payment error ' + err.message });
+        //             }
+        //             else {
+        //                 const now = new Date();
+        //                 const day = now.getDate();
+        //                 const month = now.getMonth() + 1;
+        //                 const year = now.getFullYear();
+        //                 const targetDay = 30;
+        //                 const targetMonth = 11;
+        //                 if (day === targetDay && month === targetMonth) {
+        //                     const q3 = 'SELECT status_file_id, status_file_gpa FROM dataregister_2026_april_r4 WHERE id_customer = ?';
+        //                     return db_bewsie.query(q3, [userId], (err, results) => {
+        //                         if (results[0].status_file_gpa == 'doc_correct' && results[0].status_file_id == 'doc_correct') {
+        //                             return res.status(200).json({
+        //                                 message: "เอกสารครบ พร้อมสอบ",
+        //                             });
+        //                         }
+        //                         return res.status(200).json({
+        //                             message: "เอกสารไม่ครบ",
+        //                         });
+        //                     });
+        //                 }
+        //                 return res.status(200).json({ length: results.length });
+        //             }
+        //         });
+        //     }
+        // });
     }
 });
 
@@ -424,8 +491,8 @@ register_exam_router.get('/register_info', verifyToken, (req, res) => {
 
         const data = results[0];
         data.datetime = {
-            date: '18 มกราคม 2569',
-            time: '12.00 - 15.30 น.'
+            date: 'วันที่ 18 มกราคม 2569',
+            time: '12.00 - 14.30 น.'
         };
 
         data.address = {
@@ -441,7 +508,6 @@ register_exam_router.get('/register_info', verifyToken, (req, res) => {
         delete data.amphures;
         delete data.provinces;
         delete data.zip_code;
-
         return res.status(200).json({ data });
     });
 });
@@ -509,9 +575,9 @@ register_exam_router.post('/generate-qr', async (req, res) => {
         } = req.body;
 
 
-        console.log('--- ❗️ QR Code DEBUG ❗️ ---');
-        console.log('Received raw body:', JSON.stringify(req.body, null, 2));
-        console.log('---------------------------');
+        // console.log('--- ❗️ QR Code DEBUG ❗️ ---');
+        // console.log('Received raw body:', JSON.stringify(req.body, null, 2));
+        // console.log('---------------------------');
 
         const dataToSend = new URLSearchParams(); // GBPrimePay รับ Content-Type 'x-www-form-urlencoded'
         dataToSend.append('token', 'KeNIJ50Gg0FL7lALnLRaHeGpGZZug/fubn1OhCcnHd7v+QFLGkklaNdE3M6jnUn9HikOt11vRiHQ3KeCxKJvWW7mlbNAotkgwCOqfUTVYIyac10zHuYUIX8YwPLtTg+TiBUyizWpUwXCQcz2NdYjEKWTlno=');
@@ -526,9 +592,9 @@ register_exam_router.post('/generate-qr', async (req, res) => {
         dataToSend.append('merchantDefined1', merchantDefined1);
         dataToSend.append('merchantDefined2', merchantDefined2);
 
-    
+
         console.log('Received raw body:', JSON.stringify(req.body, null, 2));
- 
+
         const gbResponse = await axios.post(
             'https://api.gbprimepay.com/v3/qrcode',
             dataToSend,
@@ -794,11 +860,12 @@ register_exam_router.post('/tiktok-pay', async (req, res) => {
 module.exports = register_exam_router;
 
 
+//*
 // register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
 //     const check = req.params.type_check;
 //     const userId = req.user.userId;// Extract userId from token
 
-//     //! เช็ค docs
+//     //! เช็ค docs remove GPA
 //     if (check == 'docs') {
 //         const queryCheckDocs = 'SELECT file_idcard, status_file_id ,status_file_gpa,  file_gpa, remark_file_id, remark_file_gpa FROM dataregister_2026_april_r4 WHERE id_customer = ?';
 
@@ -822,54 +889,224 @@ module.exports = register_exam_router;
 //                 const remarkID = results[0].remark_file_id;
 
 //                 if (!idcard && !gpa) {
-//                     return res.status(200).json({ message: 'ยังไม่อัปโหลดบัตรประชาชนและ GPA', code: "2", remark: "ยังไม่อัปโหลดบัตรประชาชนและ GPA" });
+//                     return res.status(200).json({
+//                         message: 'ยังไม่อัปโหลดบัตรประชาชนและผลการเรียน',
+//                         code: "2"
+//                     });
 //                 } else if (!idcard) {
-//                     return res.status(200).json({ message: 'ยังไม่อัปโหลดไฟล์บัตรประชาชน', code: "1-id", remark: "" });
+//                     return res.status(200).json({
+//                         message: 'ยังไม่อัปโหลดไฟล์บัตรประชาชน',
+//                         code: "1-id"
+//                     });
 //                 } else if (!gpa) {
-//                     return res.status(200).json({ message: 'ยังไม่อัปโหลดไฟล์ GPA', code: "1-gpa", remark: "" });
+//                     return res.status(200).json({
+//                         message: 'ยังไม่อัปโหลดไฟล์ผลการเรียน',
+//                         code: "1-gpa"
+//                     });
 //                 } else {
-//                     // อัปครบ
 //                     if (statusGpa == "doc_correct" && statusID == "doc_correct") {
-
-//                         return res.status(200).json({ message: 'เอกสารผ่านการตรวจสอบแล้ว', code: "0", remark: "" });
-//                     } else {
-//                         if (
-//                             (statusGpa === "doc_not_passed" || statusGpa === "doc_incomplete") &&
-//                             (statusID === "doc_not_passed" || statusID === "doc_incomplete")
-//                         ) {
-//                             return res.status(200).json({
-//                                 code: "both_not_passed",
-//                                 message: 'เอกสารทั้งสองไม่ผ่านการตรวจสอบ',
-//                                 remark: results[0].remark_file_id + ", " + results[0].remark_file_gpa
-//                             });
-//                         }
-
-//                         // GPA ไม่ผ่าน
-//                         if (statusGpa === "doc_not_passed" || statusGpa === "doc_incomplete") {
-//                             return res.status(200).json({
-//                                 code: "gpa_not_passed",
-//                                 message: 'เอกสาร GPA ไม่ผ่านการตรวจสอบ',
-//                                 remark: results[0].remark_file_gpa 
-//                             });
-//                         }
-
-//                         // ID card ไม่ผ่าน
-//                         if (statusID === "doc_not_passed" || statusID === "doc_incomplete") {
-//                             return res.status(200).json({
-//                                 code: "id_not_pass",
-//                                 message: 'สำเนาบัตรประชาชนไม่ผ่านการตรวจสอบ',
-//                                 remark: results[0].remark_file_id
-//                             });
-//                         }
-
-
+//                         return res.status(200).json({
+//                             code: "0",
+//                             message: "เอกสารผ่านการตรวจสอบแล้ว",
+//                             docs: [
+//                                 { name: "สำเนาบัตรประชาชน", status: "เอกสารผ่านเกณฑ์", remark: "" },
+//                                 { name: "ผลการเรียน", status: "เอกสารผ่านเกณฑ์", remark: "" },
+//                             ]
+//                         });
 //                     }
 
-//                     return res.status(200).json({ message: 'รอตรวจสอบ', "code": "w8", "remark": "" });
+//                     if (statusGpa === "doc_not_passed" || statusID === "doc_not_passed") {
+//                         return res.status(200).json({
+//                             code: "refund",
+//                             message: 'คุณสมบัติไม่ผ่านเกณฑ์ของโครงการ',
+//                             docs: [
+//                                 { name: "สำเนาบัตรประชาชน", status: "x", remark: remarkID },
+//                                 { name: "ผลการเรียน", status: "x", remark: remarkGPA },
+//                             ]
+//                         });
+//                     }
 
+//                     if (statusID === "doc_incomplete" && statusGpa === "doc_incomplete") {
+//                         return res.status(200).json({
+//                             code: "both_incomplete",
+//                             message: "เอกสารไม่สมบูรณ์, อัปโหลดใหม่",
+//                             docs: [
+//                                 { name: "สำเนาบัตรประชาชน", status: "เอกสารไม่สมบูรณ์", remark: remarkID },
+//                                 { name: "ผลการเรียน", status: "เอกสารไม่สมบูรณ์", remark: remarkGPA },
+//                             ]
+//                         });
+//                     }
 
+//                     if (statusGpa === "doc_incomplete" && statusID === "doc_correct") {
+//                         return res.status(200).json({
+//                             code: "gpa_incomplete",
+//                             message: 'ผลการเรียน ไม่สมบูรณ์, อัปโหลดใหม่',
+//                             docs: [
+//                                 { name: "สำเนาบัตรประชาชน", status: "เอกสารผ่านเกณฑ์", remark: "" },
+//                                 { name: "ผลการเรียน", status: "เอกสารไม่สมบูรณ์", remark: remarkGPA },
+//                             ]
+//                         });
+//                     }
+
+//                     if (statusID === "doc_incomplete" && statusGpa === "doc_correct") {
+//                         return res.status(200).json({
+//                             code: "id_incomplete",
+//                             message: 'สำเนาบัตรประชาชนไม่สมบูรณ์ ',
+//                             docs: [
+//                                 { name: "สำเนาบัตรประชาชน", status: "เอกสารไม่สมบูรณ์", remark: remarkID },
+//                                 { name: "ผลการเรียน", status: "เอกสารผ่านเกณฑ์", remark: "" },
+
+//                             ]
+//                         });
+//                     }
+
+//                     if (statusID === "" || statusGpa === "") {
+//                         return res.status(200).json({
+//                             code: "w8",
+//                             message: 'เอกสารรอตรวจสอบ',
+//                             docs: [
+//                                 { name: "สำเนาบัตรประชาชน", status: "รอตรวจสอบ", remark: remarkID },
+//                                 { name: "ผลการเรียน", status: "รอตรวจสอบ", remark: remarkGPA },
+//                             ]
+//                         });
+//                     }
+
+//                     return res.status(200).json({
+//                         code: "x",
+//                         message: 'ไม่เข้าเงื่อนไข',
+
+//                     });
 
 //                 }
 //             }
 //         });
 //     }
+//     //! เช็คว่าจะไปหน้าไหน
+//     else if (check == 'register') {
+
+//         const queryCheckRegis = `
+//     SELECT id_customer 
+//     FROM dataregister_2026_april_r4 
+//     WHERE id_customer = ?
+// `;
+
+//         db_bewsie.query(queryCheckRegis, [userId], (err, regisResults) => {
+
+//             // เช็คว่าลงทะเบียนหรือยัง
+//             if (regisResults.length === 0) {
+//                 return res.status(200).json({ message: 'no-register' });
+//             }
+
+//             // ---------- ถ้าลงทะเบียนแล้ว ----------
+
+//             const queryCheckPay = `
+//         SELECT idcard_std 
+//         FROM data_gb_prime_pay 
+//         WHERE idcard_std = ?
+//     `;
+
+//             const { idcard_std } = req.body;
+
+//             db_bewsie.query(queryCheckPay, [idcard_std], (err, payResults) => {
+
+//                 if (err) {
+//                     return res.status(400).json({
+//                         error: 'เช็ค payment error ' + err.message
+//                     });
+//                 }
+
+//                 const now = new Date();
+//                 const day = now.getDate();
+//                 const month = now.getMonth() + 1;
+
+//                 const targetDay = 25;
+//                 const targetMonth = 11;
+
+
+//                 if (day === targetDay && month === targetMonth) {
+
+//                     const q3 = `SELECT status_file_id, status_file_gpa FROM dataregister_2026_april_r4 WHERE id_customer = ?`;
+
+//                     return db_bewsie.query(q3, [userId], (err, docResults) => {
+
+//                         if (err) {
+//                             return res.status(400).json({
+//                                 error: "Database error q3: " + err.message
+//                             });
+//                         }
+
+//                         if (docResults.length === 0) {
+//                             return res.status(404).json({
+//                                 message: "ไม่พบข้อมูลเอกสาร"
+//                             });
+//                         }
+
+//                         const { status_file_id, status_file_gpa } = docResults[0];
+
+//                         if (status_file_id === 'doc_correct' &&
+//                             status_file_gpa === 'doc_correct') {
+//                             return res.status(200).json({
+//                                 length: 2
+//                             });
+//                         }
+//                         //       message: "เอกสารไม่ครบ",
+//                         return res.status(200).json({
+
+//                             length: payResults.length
+//                         });
+
+//                     });
+//                 }
+
+//                 // ====== ไม่ใช่วันพิเศษ → return ปกติ ======
+//                 return res.status(200).json({
+//                     length: payResults.length
+//                 });
+
+//             });
+//         });
+
+//         // const queryCheckRegis = 'SELECT id_customer FROM dataregister_2026_april_r4 WHERE id_customer = ?';
+//         // db_bewsie.query(queryCheckRegis, [userId], (err, results) => {
+//         //     // สมัครรึยีัง 
+//         //     if (results.length == 0) {
+//         //         return res.status(200).json({ message: 'no-register' });
+//         //     }
+//         //     // ถ้าสมัครแล้ว จ่ายเงินรึยัง 1. payment_screen, 2. infoCheck
+//         //     else {
+//         //         // ต้องเปลี่ยนตรงนรี้เพื่อ tiktok 
+//         //         const queryCheckPay = 'SELECT idcard_std FROM data_gb_prime_pay WHERE idcard_std = ?';
+//         //         const { idcard_std } = req.body;
+//         //         db_bewsie.query(queryCheckPay, [idcard_std], (err, results) => {
+//         //             console.log(results.length);
+
+//         //             if (err) {
+//         //                 return res.status(400).json({ error: 'เช็ค payment error ' + err.message });
+//         //             }
+//         //             else {
+//         //                 const now = new Date();
+//         //                 const day = now.getDate();
+//         //                 const month = now.getMonth() + 1;
+//         //                 const year = now.getFullYear();
+//         //                 const targetDay = 30;
+//         //                 const targetMonth = 11;
+//         //                 if (day === targetDay && month === targetMonth) {
+//         //                     const q3 = 'SELECT status_file_id, status_file_gpa FROM dataregister_2026_april_r4 WHERE id_customer = ?';
+//         //                     return db_bewsie.query(q3, [userId], (err, results) => {
+//         //                         if (results[0].status_file_gpa == 'doc_correct' && results[0].status_file_id == 'doc_correct') {
+//         //                             return res.status(200).json({
+//         //                                 message: "เอกสารครบ พร้อมสอบ",
+//         //                             });
+//         //                         }
+//         //                         return res.status(200).json({
+//         //                             message: "เอกสารไม่ครบ",
+//         //                         });
+//         //                     });
+//         //                 }
+//         //                 return res.status(200).json({ length: results.length });
+//         //             }
+//         //         });
+//         //     }
+//         // });
+//     }
+// });

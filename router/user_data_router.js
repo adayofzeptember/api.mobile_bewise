@@ -164,7 +164,7 @@ user_data_router.post('/login', (req, res) => {
 //Get Profile Route (Always Fetch Fresh Data)
 user_data_router.get('/get_profile', verifyToken, (req, res) => {
     const userId = req.user.userId; // Extract userId from token
-    
+
     const get_profile_query = `
     SELECT 
     users.user_email, 
@@ -695,3 +695,22 @@ user_data_router.post('/loginsocial_apple', (req, res) => {
 
 
 module.exports = user_data_router;
+
+
+
+
+
+// const corsOptions = {
+//   //origin: 'http://localhost:8000',
+//   origin: 'https://tgat-ready.bewise-academy.com', 
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//   allowedHeaders: [
+//     'Content-Type',
+//     'Authorization',
+//     'X-Requested-With',
+//     'Api-Key'
+//   ],
+//   credentials: true
+// };
+// app.use(cors(corsOptions));
+// app.options('*', cors(corsOptions));
