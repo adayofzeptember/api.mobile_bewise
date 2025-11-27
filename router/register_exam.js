@@ -350,10 +350,9 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
                             });
                         }
 
-                        const { status_file_id, status_file_gpa } = docResults[0];
+                        const { status_file_id } = docResults[0];
 
-                        if (status_file_id === 'doc_correct' &&
-                            status_file_gpa === 'doc_correct') {
+                        if (status_file_id === 'doc_correct') {
                             return res.status(200).json({
                                 length: 2
                             });
