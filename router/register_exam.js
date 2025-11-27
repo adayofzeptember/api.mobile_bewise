@@ -3,13 +3,17 @@ const db_bewsie = require('../db/db_bewise');
 const register_exam_router = express.Router();
 const verifyToken = require('../functions/auth');
 const axios = require('axios');
+//const { targetDay, targetMonth, datetime } = require('../functions/config');
+const import_config = require('../functions/config');
+
 require('dotenv').config(); // โหลดตัวแปรจากไฟล์ . env
+
 
 register_exam_router.post('/register', verifyToken, async (req, res) => {
     const { format, constructFrom } = require('date-fns');
 
     const formattedDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss'); // 🟢 Generate current timestamp
-    const query_check = 'SELECT id_customer FROM dataregister_2026_april_r4 WHERE id_customer = ?';
+    const query_check = `SELECT id_customer FROM ${import_config.data_register_round} WHERE id_customer = ?`;
     const { id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng, datanickname, datanickname_eng,
         dataage, gender, datanation, datatel, dataidline, dataemail, dataadd,
         districts, amphurs, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school, school_type, datalevel,
@@ -24,7 +28,7 @@ register_exam_router.post('/register', verifyToken, async (req, res) => {
             return res.status(200).json({ message: 'ข้อมูลของคุณมีอยู่ในระบบแล้ว! กรุณาตรวจสอบข้อมูลของคุณอีกครั้ง สอบถามเพิ่มเติมได้ที่ Line OA @bewise' });
         }
 
-        const query_exam_register = `INSERT INTO dataregister_2026_april_r4 (
+        const query_exam_register = `INSERT INTO ${import_config.data_register_round} (
         id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng, 
         datanickname, datanickname_eng, dataage, gender, datanation, datatel, dataidline, dataemail, dataadd, 
         districts, amphures, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school,school_type, datalevel, 
@@ -40,7 +44,7 @@ register_exam_router.post('/register', verifyToken, async (req, res) => {
                     return res.status(500).json({ message: 'error', err });
                 }
                 //! get ตรงนี้ แล้ว retuernid, branch ไว้ใว่ที่ id_cardSTD
-                const quey_getPayment = 'SELECT id, branch, city, id_customer FROM dataregister_2026_april_r4 WHERE id_customer = ?';
+                const quey_getPayment = `SELECT id, branch, city, id_customer FROM ${import_config.data_register_round} WHERE id_customer = ?`;
                 //!
                 db_bewsie.query(quey_getPayment, [id_customer], (err, resultsGet) => {
                     if (err) {
@@ -94,8 +98,7 @@ register_exam_router.put('/update_afterslip', verifyToken, (req, res) => {
 
     // console.log(idcard_std);
     const query_update_payment = `
-            UPDATE dataregister_2026_april_r4 
-                SET 
+            UPDATE ${import_config.data_register_round} SET 
                     idcard_std = ?    
         WHERE id_customer = ?`;
 
@@ -120,14 +123,14 @@ register_exam_router.put('/Update_Docs/:check', verifyToken, (req, res) => {
     var values = [];
     if (req.params.check == "gpa") {
         query_update_docs2 = `
-                UPDATE dataregister_2026_april_r4 
+                UPDATE ${import_config.data_register_round} 
                     SET
                     file_gpa = ?, status_file_gpa = '', remark_file_gpa = ''
                     WHERE id_customer = ?`;
         values = [gpa_name, userID];
     } else if (req.params.check == "id") {
         query_update_docs2 = `
-            UPDATE dataregister_2026_april_r4 
+            UPDATE ${import_config.data_register_round} 
                 SET
                     file_idcard = ?, status_file_id = '', remark_file_id = ''
                 WHERE id_customer = ?`;
@@ -137,7 +140,7 @@ register_exam_router.put('/Update_Docs/:check', verifyToken, (req, res) => {
 
     else {
         query_update_docs2 = `
-            UPDATE dataregister_2026_april_r4 
+            UPDATE ${import_config.data_register_round}
                 SET 
                     file_idcard = ?, file_gpa = ?, status_file_id = '', remark_file_id = '', status_file_gpa = '', remark_file_gpa = ''
                 WHERE id_customer = ?`;
@@ -157,39 +160,7 @@ register_exam_router.put('/Update_Docs/:check', verifyToken, (req, res) => {
     });
 });
 
-register_exam_router.post('/insert_payment/:id', verifyToken, (req, res) => {
-    //! insert ลง table การชำระเงิน
 
-    const customer_id = req.params.id;
-    const { payment_time, payment_date, payment_amount } = req.body;
-    const query_checkRole = "SELECT id_customer, dataschool, datatel, datanickname, dataname, idcard, idcard_std, city, branch FROM dataregister_2026_april_r4 WHERE id_customer = ? ";
-    db_bewsie.query(query_checkRole, [customer_id], (err, results1) => {
-        if (err) {
-            console.error('ERROR QUERY ---> ', err.message);
-            res.status(500).send('error');
-            return;
-        }
-
-        const query_exam_register = `INSERT INTO datapayment_2026_april_r3 (
-            id_customer, dataschool, datatel, datanickname, dataname, idcard, idcard_std, city, branch, payment_bank, payment_status,
-            payment_time, payment_date, payment_amount
-    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);`;
-
-        db_bewsie.query(query_exam_register, [results1[0].id_customer, results1[0].dataschool, results1[0].datatel, results1[0].datanickname,
-        results1[0].dataname, results1[0].idcard, results1[0].idcard_std, results1[0].city, results1[0].branch, "QR Payment", "ชำระแล้ว",
-            payment_time, payment_date, payment_amount
-        ], (err, results2) => {
-            if (err) {
-                console.error('Error inserting register exam:', err);
-                return res.status(500).json({ message: 'error', err });
-            }
-            res.status(200).json({
-                data: results2
-            });
-            //!
-        });
-    });
-});
 
 register_exam_router.get('/news', (req, res) => {
 
@@ -206,7 +177,7 @@ register_exam_router.get('/news', (req, res) => {
 
 register_exam_router.get('/check_register', verifyToken, (req, res) => {
     const userId = req.user.userId;
-    const queryCheckRegis = 'SELECT * FROM dataregister_2026_april_r4 WHERE id_customer = ?';
+    const queryCheckRegis = `SELECT * FROM ${import_config.data_register_round} WHERE id_customer = ?`;
     db_bewsie.query(queryCheckRegis, [userId], (err, results) => {
         if (results.length == 0) {
             return res.status(200).json({ message: 'ยังไม่สมัคร', status: 0 });
@@ -224,7 +195,7 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
 
     //! เช็ค docs remove GPA
     if (check == 'docs') {
-        const queryCheckDocs = 'SELECT file_idcard, status_file_id ,status_file_gpa,  file_gpa, remark_file_id, remark_file_gpa FROM dataregister_2026_april_r4 WHERE id_customer = ?';
+        const queryCheckDocs = `SELECT file_idcard, status_file_id ,status_file_gpa,  file_gpa, remark_file_id, remark_file_gpa FROM ${import_config.data_register_round} WHERE id_customer = ?`;
 
         db_bewsie.query(queryCheckDocs, [userId], (err, results) => {
 
@@ -295,18 +266,16 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
 
         const queryCheckRegis = `
     SELECT id_customer 
-    FROM dataregister_2026_april_r4 
+    FROM ${import_config.data_register_round} 
     WHERE id_customer = ?
 `;
 
         db_bewsie.query(queryCheckRegis, [userId], (err, regisResults) => {
 
-            // เช็คว่าลงทะเบียนหรือยัง
             if (regisResults.length === 0) {
                 return res.status(200).json({ message: 'no-register' });
             }
 
-            // ---------- ถ้าลงทะเบียนแล้ว ----------
 
             const queryCheckPay = `
         SELECT idcard_std 
@@ -328,13 +297,12 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
                 const day = now.getDate();
                 const month = now.getMonth() + 1;
 
-                const targetDay = 25;
-                const targetMonth = 11;
 
 
-                if (day === targetDay && month === targetMonth) {
 
-                    const q3 = `SELECT status_file_id, status_file_gpa FROM dataregister_2026_april_r4 WHERE id_customer = ?`;
+                if (day === import_config.targetDay && month === import_config.targetMonth) {
+
+                    const q3 = `SELECT status_file_id, status_file_gpa FROM ${import_config.data_register_round} WHERE id_customer = ?`;
 
                     return db_bewsie.query(q3, [userId], (err, docResults) => {
 
@@ -353,13 +321,13 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
                         const { status_file_id } = docResults[0];
 
                         if (status_file_id === 'doc_correct') {
+                            // ไปรอสอบ
                             return res.status(200).json({
                                 length: 2
                             });
                         }
-                        //       message: "เอกสารไม่ครบ",
-                        return res.status(200).json({
 
+                        return res.status(200).json({
                             length: payResults.length
                         });
 
@@ -426,7 +394,7 @@ register_exam_router.put('/update_idcard_std', verifyToken, (req, res) => {
 
     // console.log(idcard_std);
     const query_update_payment = `
-            UPDATE dataregister_2026_april_r4 
+            UPDATE ${import_config.data_register_round} 
                 SET 
                     idcard_std = ?    
         WHERE id_customer = ?`;
@@ -467,7 +435,7 @@ register_exam_router.get('/register_info', verifyToken, (req, res) => {
           gpax_eng,
           dataparent,
           dataparenttel
-        FROM dataregister_2026_april_r4 
+        FROM ${import_config.data_register_round}
         WHERE id_customer = ?
     `;
 
@@ -489,10 +457,13 @@ register_exam_router.get('/register_info', verifyToken, (req, res) => {
         // }
 
         const data = results[0];
-        data.datetime = {
-            date: 'วันที่ 18 มกราคม 2569',
-            time: '12.00 - 14.30 น.'
-        };
+
+
+
+
+        data.datetime = import_config.datetime;
+        console.log(import_config.targetDay);
+
 
         data.address = {
             address: data.dataadd,
@@ -592,7 +563,7 @@ register_exam_router.post('/generate-qr', async (req, res) => {
         dataToSend.append('merchantDefined2', merchantDefined2);
 
 
-        console.log('Received raw body:', JSON.stringify(req.body, null, 2));
+        //console.log('Received raw body:', JSON.stringify(req.body, null, 2));
 
         const gbResponse = await axios.post(
             'https://api.gbprimepay.com/v3/qrcode',
@@ -1108,4 +1079,40 @@ module.exports = register_exam_router;
 //         //     }
 //         // });
 //     }
+// });
+
+
+
+//register_exam_router.post('/insert_payment/:id', verifyToken, (req, res) => {
+//     //! insert ลง table การชำระเงิน
+
+//     const customer_id = req.params.id;
+//     const { payment_time, payment_date, payment_amount } = req.body;
+//     const query_checkRole = `SELECT id_customer, dataschool, datatel, datanickname, dataname, idcard, idcard_std, city, branch FROM ${import_config.data_register_round} WHERE id_customer = ? `;
+//     db_bewsie.query(query_checkRole, [customer_id], (err, results1) => {
+//         if (err) {
+//             console.error('ERROR QUERY ---> ', err.message);
+//             res.status(500).send('error');
+//             return;
+//         }
+
+//         const query_exam_register = `INSERT INTO datapayment_2026_april_r3 (
+//             id_customer, dataschool, datatel, datanickname, dataname, idcard, idcard_std, city, branch, payment_bank, payment_status,
+//             payment_time, payment_date, payment_amount
+//     ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);`;
+
+//         db_bewsie.query(query_exam_register, [results1[0].id_customer, results1[0].dataschool, results1[0].datatel, results1[0].datanickname,
+//         results1[0].dataname, results1[0].idcard, results1[0].idcard_std, results1[0].city, results1[0].branch, "QR Payment", "ชำระแล้ว",
+//             payment_time, payment_date, payment_amount
+//         ], (err, results2) => {
+//             if (err) {
+//                 console.error('Error inserting register exam:', err);
+//                 return res.status(500).json({ message: 'error', err });
+//             }
+//             res.status(200).json({
+//                 data: results2
+//             });
+//             //!
+//         });
+//     });
 // });

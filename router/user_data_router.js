@@ -161,7 +161,6 @@ user_data_router.post('/login', (req, res) => {
 });
 
 
-//Get Profile Route (Always Fetch Fresh Data)
 user_data_router.get('/get_profile', verifyToken, (req, res) => {
     const userId = req.user.userId; // Extract userId from token
 
@@ -397,7 +396,7 @@ user_data_router.delete('/deleteUser', verifyToken, (req, res) => {
 //             UNION ALL
 //             SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2025_july_r2
 //             UNION ALL
-//             SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2026_april_r4
+//             SELECT id_customer, idcard_std, city, branch, date_regis FROM dataregister_2026_april_r20244
 //         ) AS d
 //         LEFT JOIN branch AS b 
 //         ON d.branch COLLATE utf8_unicode_ci = b.code_branch COLLATE utf8_unicode_ci

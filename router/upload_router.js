@@ -7,14 +7,15 @@ const upload_router = express.Router();
 const currentYear = new Date().getFullYear();
 const db_bewsie = require('../db/db_bewise');
 const verifyToken = require('../functions/auth');
+const import_config = require('../functions/config');
 
 //! Path server   
 const baseUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/uploads/${currentYear}/mod_customer`;
-const fileUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/file_BWG_April_R4_2026`;
+const fileUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/${import_config.file_upload_round}`;
 
 //*localhost
 // const baseUploadDir = path.join(__dirname, '..', 'uploads', `${currentYear}`, 'mod_customer');
-// const fileUploadDir = path.join(__dirname, '..', 'file_BWG_April_R4_2026');
+// const fileUploadDir = path.join(__dirname, '..', '${import_config.file_upload_round}');
 
 // if (!fs.existsSync(fileUploadDir)) {
 //     fs.mkdirSync(fileUploadDir, { recursive: true });
@@ -151,8 +152,7 @@ upload_router.post('/upload_file', verifyToken, uploadFile.single('file'), (req,
     if (!req.file) {
         return res.status(400).json({ message: "ไม่ได้อัปโหลดไฟล์" });
     }
-
-    const filePath = `file_BWG_April_R4_2026/${req.file.filename}`;
+    const filePath = `${import_config.file_upload_round}/${req.file.filename}`;
     const directory = path.dirname(filePath) + '/';
     const filename = path.basename(filePath);
 

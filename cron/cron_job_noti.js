@@ -1,13 +1,14 @@
-// noti_payment_cron.js
 const cron = require('node-cron');
-const db_bewsie = require('../db/db_bewise'); // ไฟล์ DB ของคุณ
-const { sendNotificationToMany } = require('../functions/notiSend_function'); // ฟังชั่นส่ง FCM
+const db_bewsie = require('../db/db_bewise');
+const { sendNotificationToMany } = require('../functions/notiSend_function');
+const import_config = require('../functions/config');
+
 
 async function sendPaymentReminder() {
     const query = `
     SELECT DISTINCT f.device_token 
     FROM fcm_token f 
-    INNER JOIN dataregister_2026_april_r4 d 
+    INNER JOIN ${import_config.data_register_round} d 
     ON f.id_customer = d.id_customer 
     WHERE TRIM(d.idcard_std) = ''
   `;
@@ -38,7 +39,7 @@ async function sendPaymentReminder() {
 }
 //*
 async function sendDocsNoti() {
-    const query = "SELECT DISTINCT f.device_token FROM fcm_token f INNER JOIN dataregister_2026_april_r4 d ON f.id_customer = d.id_customer WHERE (d.idcard_std != '' AND d.idcard_std IS NOT NULL) AND NOT (d.status_file_id = 'doc_correct' AND d.status_file_gpa = 'doc_correct') AND NOT ( d.file_idcard != '' AND d.file_gpa != '' AND d.status_file_id = '' AND d.status_file_gpa = '' );";
+    const query = `SELECT DISTINCT f.device_token FROM fcm_token f INNER JOIN ${import_config.data_register_round} d ON f.id_customer = d.id_customer WHERE (d.idcard_std != '' AND d.idcard_std IS NOT NULL) AND NOT (d.status_file_id = 'doc_correct' AND d.status_file_gpa = 'doc_correct') AND NOT ( d.file_idcard != '' AND d.file_gpa != '' AND d.status_file_id = '' AND d.status_file_gpa = '' );`;
 
     db_bewsie.query(query, async (err, results) => {
         if (err) {

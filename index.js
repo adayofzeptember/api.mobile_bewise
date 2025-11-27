@@ -46,10 +46,3 @@ app.listen(onPort, () => {
 });
 
 //startCron();
-
-//  data.datetime = {
-//           date: '12 ตุลาคม 2568',
-//           time: '12.00 - 14.30 น.'
-//       };
-//              const targetDay = 25;
-//              const targetMonth = 11;

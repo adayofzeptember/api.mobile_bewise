@@ -2,7 +2,8 @@ const express = require("express");
 const admin = require("firebase-admin");
 const fs = require("fs");
 const router = express.Router();
-const db_bewsie = require('../db/db_bewise');
+const db_bewsie = require('../db/db_bewise'); 
+const import_config = require('../functions/config');
 const { sendNotification, sendNotificationToMany } = require("../functions/notiSend_function");
 
 // ✅ โหลด service account key
@@ -63,7 +64,7 @@ router.post("/boardcast", async (req, res) => {
 
 router.post("/noti_payment", async (req, res) => {
 
-  const query = "SELECT DISTINCT f.device_token FROM fcm_token f INNER JOIN dataregister_2026_april_r4 d ON f.id_customer = d.id_customer WHERE TRIM(d.idcard_std) = ''";
+  const query = `SELECT DISTINCT f.device_token FROM fcm_token f INNER JOIN ${import_config.data_register_round} d ON f.id_customer = d.id_customer WHERE TRIM(d.idcard_std) = ''`;
 
   db_bewsie.query(query, async (err, results) => {
 
@@ -93,8 +94,7 @@ router.post("/noti_payment", async (req, res) => {
 });
 
 router.post("/docs", async (req, res) => {
-  //const query = "SELECT DISTINCT f.device_token FROM fcm_token f INNER JOIN dataregister_2026_april_r4 d ON f.id_customer = d.id_customer WHERE (d.idcard_std != '' AND d.idcard_std IS NOT NULL) AND NOT (d.status_file_id = 'doc_correct' AND d.status_file_gpa = 'doc_correct');";
-  const query = "SELECT DISTINCT f.device_token FROM fcm_token f INNER JOIN dataregister_2026_april_r4 d ON f.id_customer = d.id_customer WHERE (d.idcard_std != '' AND d.idcard_std IS NOT NULL) AND NOT (d.status_file_id = 'doc_correct' AND d.status_file_gpa = 'doc_correct') AND NOT ( d.file_idcard != '' AND d.file_gpa != '' AND d.status_file_id = '' AND d.status_file_gpa = '' );";
+  const query = `SELECT DISTINCT f.device_token FROM fcm_token f INNER JOIN ${import_config.data_register_round} d ON f.id_customer = d.id_customer WHERE (d.idcard_std != '' AND d.idcard_std IS NOT NULL) AND NOT (d.status_file_id = 'doc_correct' AND d.status_file_gpa = 'doc_correct') AND NOT ( d.file_idcard != '' AND d.file_gpa != '' AND d.status_file_id = '' AND d.status_file_gpa = '' );`;
 
   db_bewsie.query(query, async (err, results) => {
 
@@ -114,7 +114,7 @@ router.post("/docs", async (req, res) => {
       res.json({
         success: true,
         deviceTokensList
- 
+
       });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
