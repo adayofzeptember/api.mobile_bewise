@@ -8,5 +8,7 @@ module.exports = {
     },
     //
     file_upload_round: 'file_BWG_April_R4_2026',
-    data_register_round: 'dataregister_2026_april_r4'
+    //data_register_round: 'dataregister_2026_april_r4'
+    data_register_round: 'dataregister_2026_oct_r1'
+
 };
