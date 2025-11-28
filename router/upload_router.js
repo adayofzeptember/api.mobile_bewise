@@ -3,6 +3,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const axios = require("axios");
 const upload_router = express.Router();
 const currentYear = new Date().getFullYear();
 const db_bewsie = require('../db/db_bewise');
@@ -15,7 +16,7 @@ const fileUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/${import_confi
 
 //*localhost
 // const baseUploadDir = path.join(__dirname, '..', 'uploads', `${currentYear}`, 'mod_customer');
-// const fileUploadDir = path.join(__dirname, '..', '${import_config.file_upload_round}');
+// const fileUploadDir = path.join(__dirname, '..', `${import_config.file_upload_round}`);
 
 // if (!fs.existsSync(fileUploadDir)) {
 //     fs.mkdirSync(fileUploadDir, { recursive: true });
@@ -36,24 +37,12 @@ const storageProfileImage = multer.diskStorage({
 });
 
 
-// const storageFile = multer.diskStorage({
-//     destination: function (req, file, cb) {
-//         cb(null, fileUploadDir);
-//     },
-//     filename: function (req, file, cb) {
-//         const ext = path.extname(file.originalname);
-//         const basename = path.basename(file.originalname, ext);
-//         cb(null, Date.now() + '-' + basename + ext);
-//     }
-// });
-
 
 const storageFile = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, fileUploadDir);
     },
     filename: function (req, file, cb) {
-        // ใช้ชื่อไฟล์ที่ Flutter ส่งมาเลย
         cb(null, file.originalname);
     }
 });
@@ -70,6 +59,61 @@ const uploadFile = multer({
     limits: { fileSize: 5 * 1024 * 1024 },
     //fileFilter: imageAndPdfFilter,
 });
+
+
+upload_router.post("/check_idcard", uploadFile.single("file"), async (req, res) => {
+    try {
+ 
+
+        if (!req.file) {
+            return res.status(400).json({ message: "กรุณาอัปโหลดไฟล์" });
+        }
+
+        const filePath = req.file.path;
+        const fileData = fs.readFileSync(filePath);
+
+        const base64String = fileData.toString("base64");
+
+        const api = "https://api.aigen.online/aiscript/idcard/v2";
+        const headers = {
+            "x-aigen-key": "AGxcuyo3iqa7jsy9iczbfrzfu6ylmn1bwc",
+        };
+
+        const data = {
+            image: base64String,
+            option: {}
+        };
+
+        const response = await axios.post(api, data, { headers });
+
+
+
+        return res.json({
+            message: "success",
+            id_number: response.data.data?.[0]?.id_number?.value || null,
+            en: {
+                title_en: response.data.data?.[0]?.title_en?.value || null,
+                name_en: response.data.data?.[0]?.name_en?.value || null,
+                surname_en: response.data.data?.[0]?.surname_en?.value || null,
+            },
+            th: {
+                title_th: response.data.data?.[0]?.title_th?.value || null,
+                name_th: response.data.data?.[0]?.name_th?.value || null,
+                surname_th: response.data.data?.[0]?.surname_th?.value || null,
+            },
+        });
+
+
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).json({
+            message: "รูปแบบบัตรประชาชนไม่ถูกต้อง",
+
+        });
+    }
+});
+
+
 
 
 upload_router.post('/upload_profile_pic', verifyToken, uploadImage.single('photo'), (req, res) => {

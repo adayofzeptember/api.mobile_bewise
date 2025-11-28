@@ -47,10 +47,6 @@ async function sendDocsNoti() {
             return;
         }
 
-
-
-
-
         const deviceTokensList = results.map(row => row.device_token);
         if (deviceTokensList.length === 0) {
             return;
@@ -78,7 +74,6 @@ function startCron() {
             console.error('❌ เกิดข้อผิดพลาดใน cron sendPaymentReminder:', error);
         }
     }, {
-
         timezone: "Asia/Bangkok"
     });
 

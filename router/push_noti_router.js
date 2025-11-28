@@ -44,8 +44,7 @@ router.post("/boardcast", async (req, res) => {
 
 
     const tokens = results.map(r => r.device_token);
-    // console.log("Tokens to send:", tokens);
-    if (tokens.length === 0) return res.status(404).json({ success: false, message: "No tokens found" });
+     if (tokens.length === 0) return res.status(404).json({ success: false, message: "No tokens found" });
 
     try {
       const response = await sendNotificationToMany(tokens, title, body);

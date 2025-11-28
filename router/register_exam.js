@@ -5,7 +5,6 @@ const verifyToken = require('../functions/auth');
 const axios = require('axios');
 //const { targetDay, targetMonth, datetime } = require('../functions/config');
 const import_config = require('../functions/config');
-
 require('dotenv').config(); // โหลดตัวแปรจากไฟล์ . env
 
 
@@ -16,8 +15,8 @@ register_exam_router.post('/register', verifyToken, async (req, res) => {
     const query_check = `SELECT id_customer FROM ${import_config.data_register_round} WHERE id_customer = ?`;
     const { id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng, datanickname, datanickname_eng,
         dataage, gender, datanation, datatel, dataidline, dataemail, dataadd,
-        districts, amphurs, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school, school_type, datalevel,
-        dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, code_branch, databd, file_idcard, file_gpa } = req.body;
+        districts, amphurs, provinces, zip_code, dataschool, provinces_school, school_type, datalevel,
+        dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, code_branch, databd, file_idcard } = req.body;
 
     db_bewsie.query(query_check, [id_customer], (err, results) => {
         if (err) {
@@ -31,14 +30,14 @@ register_exam_router.post('/register', verifyToken, async (req, res) => {
         const query_exam_register = `INSERT INTO ${import_config.data_register_round} (
         id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng, 
         datanickname, datanickname_eng, dataage, gender, datanation, datatel, dataidline, dataemail, dataadd, 
-        districts, amphures, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school,school_type, datalevel, 
-        dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, date_regis, branch, databd, file_idcard, file_gpa
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);`;
+        districts, amphures, provinces, zip_code, dataschool, provinces_school,school_type, datalevel, 
+        dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, date_regis, branch, databd, file_idcard, status_file_id
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'doc_correct');`;
 
         db_bewsie.query(query_exam_register, [id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng,
             datanickname, datanickname_eng, dataage, gender, datanation, datatel, dataidline, dataemail, dataadd,
-            districts, amphurs, provinces, zip_code, dataschool, gpax, gpax_eng, provinces_school, school_type, datalevel,
-            dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, formattedDate, code_branch, databd, file_idcard, file_gpa], (err, results) => {
+            districts, amphurs, provinces, zip_code, dataschool, provinces_school, school_type, datalevel,
+            dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, formattedDate, code_branch, databd, file_idcard], (err, results) => {
                 if (err) {
                     console.error('Error inserting register exam:', err);
                     return res.status(500).json({ message: 'error', err });
@@ -114,7 +113,7 @@ register_exam_router.put('/update_afterslip', verifyToken, (req, res) => {
     });
 });
 
-register_exam_router.put('/Update_Docs/:check', verifyToken, (req, res) => {
+register_exam_router.put('/update_docs/:check', verifyToken, (req, res) => {
     //! อัปเดทส่งเอกสารรอบ 2 
 
     const userID = req.user.userId;
@@ -223,7 +222,6 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
                         return res.status(200).json({
                             code: "passed",
                             message: "เอกสารผ่านการตรวจสอบแล้ว",
-
                         });
                     }
 
@@ -247,16 +245,13 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
                         return res.status(200).json({
                             code: "wait",
                             message: 'เอกสารรอตรวจสอบ',
-
                         });
                     }
 
                     return res.status(200).json({
-                        code: "x",
+                        code: "N/A",
                         message: 'ไม่เข้าเงื่อนไข',
-
                     });
-
                 }
             }
         });
@@ -264,11 +259,7 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
     //! เช็คว่าจะไปหน้าไหน
     else if (check == 'register') {
 
-        const queryCheckRegis = `
-    SELECT id_customer 
-    FROM ${import_config.data_register_round} 
-    WHERE id_customer = ?
-`;
+        const queryCheckRegis = `SELECT id_customer FROM ${import_config.data_register_round} WHERE id_customer = ?`;
 
         db_bewsie.query(queryCheckRegis, [userId], (err, regisResults) => {
 
@@ -277,11 +268,7 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
             }
 
 
-            const queryCheckPay = `
-        SELECT idcard_std 
-        FROM data_gb_prime_pay 
-        WHERE idcard_std = ?
-    `;
+            const queryCheckPay = `SELECT idcard_std FROM data_gb_prime_pay WHERE idcard_std = ?`;
 
             const { idcard_std } = req.body;
 
@@ -296,9 +283,6 @@ register_exam_router.get('/check_docs/:type_check', verifyToken, (req, res) => {
                 const now = new Date();
                 const day = now.getDate();
                 const month = now.getMonth() + 1;
-
-
-
 
                 if (day === import_config.targetDay && month === import_config.targetMonth) {
 
@@ -549,9 +533,9 @@ register_exam_router.post('/generate-qr', async (req, res) => {
         // console.log('Received raw body:', JSON.stringify(req.body, null, 2));
         // console.log('---------------------------');
 
-        const dataToSend = new URLSearchParams(); // GBPrimePay รับ Content-Type 'x-www-form-urlencoded'
+        const dataToSend = new URLSearchParams();
         dataToSend.append('token', 'KeNIJ50Gg0FL7lALnLRaHeGpGZZug/fubn1OhCcnHd7v+QFLGkklaNdE3M6jnUn9HikOt11vRiHQ3KeCxKJvWW7mlbNAotkgwCOqfUTVYIyac10zHuYUIX8YwPLtTg+TiBUyizWpUwXCQcz2NdYjEKWTlno=');
-        dataToSend.append('amount', '300.00'); // เช่น '300.00'
+        dataToSend.append('amount', '300.00');
         dataToSend.append('backgroundUrl', 'https://bewise-global.com/gbprimepay/promptpay/webhook_gb_pp_full_final');
         //*
         dataToSend.append('referenceNo', referenceNo);
@@ -562,8 +546,6 @@ register_exam_router.post('/generate-qr', async (req, res) => {
         dataToSend.append('merchantDefined1', merchantDefined1);
         dataToSend.append('merchantDefined2', merchantDefined2);
 
-
-        //console.log('Received raw body:', JSON.stringify(req.body, null, 2));
 
         const gbResponse = await axios.post(
             'https://api.gbprimepay.com/v3/qrcode',
@@ -826,6 +808,10 @@ register_exam_router.post('/tiktok-pay', async (req, res) => {
         }
     }
 });
+
+
+
+
 
 module.exports = register_exam_router;
 

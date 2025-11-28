@@ -1,6 +1,5 @@
 const admin = require("firebase-admin");
 
-// ตรวจว่า initial แล้วหรือยัง (กันบั๊กเวลา import หลายไฟล์)
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert(require("../serviceAccountKey.json")), // ไฟล์ key ของ Firebase
@@ -28,40 +27,6 @@ async function sendNotification(token, title, body) {
   }
 }
 
-// async function sendNotificationToMany(tokens, title, body) {
-//   if (!tokens || tokens.length === 0) {
-//     throw new Error("No tokens provided");
-//   }
-
-//   const CHUNK_SIZE = 400; 
-//   let successCount = 0;
-//   let failureCount = 0;
-
-//   for (let i = 0; i < tokens.length; i += CHUNK_SIZE) {
-//     const chunk = tokens.slice(i, i + CHUNK_SIZE);
-
-//     const message = {
-//       notification: { title, body },
-//       tokens: chunk,
-//     };
-
-//     try {
-//       const response = await admin.messaging().sendEachForMulticast(message);
-//       successCount += response.successCount;
-//       failureCount += response.failureCount;
-//       console.log(`sent: ${response.successCount} success, ${response.failureCount} failed`);
-//     } catch (error) {
-
-
-
-        
-//       console.error("❌ Error sending batch:", error);
-//       failureCount += chunk.length; // นับว่าล้มทั้งหมด
-//     }
-//   }
-
-//   return { successCount, failureCount };
-// }
 async function sendNotificationToMany(tokens, title, body) {
   if (!tokens || tokens.length === 0) {
     throw new Error("No tokens provided");
