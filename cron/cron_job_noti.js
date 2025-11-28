@@ -71,7 +71,7 @@ function startCron() {
         try {
             await sendPaymentReminder();
         } catch (error) {
-            console.error('❌ เกิดข้อผิดพลาดใน cron sendPaymentReminder:', error);
+            console.error('❌ เกิดข้อผิดพลาดใน cron senddPaymentReminder:', error);
         }
     }, {
         timezone: "Asia/Bangkok"
