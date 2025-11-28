@@ -77,15 +77,15 @@ function startCron() {
         timezone: "Asia/Bangkok"
     });
 
-    cron.schedule('0 10,15,19 * * *', async () => {
-        try {
-            await sendDocsNoti();
-        } catch (error) {
-            console.error('❌ เกิดข้อผิดพลาดใน cron sendDocsNoti:', error);
-        }
-    }, {
-        timezone: "Asia/Bangkok"
-    });
+    // cron.schedule('0 10,15,19 * * *', async () => {
+    //     try {
+    //         await sendDocsNoti();
+    //     } catch (error) {
+    //         console.error('❌ เกิดข้อผิดพลาดใน cron sendDocsNoti:', error);
+    //     }
+    // }, {
+    //     timezone: "Asia/Bangkok"
+    // });
 }
 
 module.exports = { startCron, sendPaymentReminder };
