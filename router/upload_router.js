@@ -10,17 +10,17 @@ const db_bewsie = require('../db/db_bewise');
 const verifyToken = require('../functions/auth');
 const import_config = require('../functions/config');
 
-//! Path server   
-const baseUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/uploads/${currentYear}/mod_customer`;
-const fileUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/${import_config.file_upload_round}`;
+//* Path server   
+// const baseUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/uploads/${currentYear}/mod_customer`;
+// const fileUploadDir = `/newdata/vhosts/bewise-global.com/httpdocs/${import_config.file_upload_round}`;
 
 //*localhost
-// const baseUploadDir = path.join(__dirname, '..', 'uploads', `${currentYear}`, 'mod_customer');
-// const fileUploadDir = path.join(__dirname, '..', `${import_config.file_upload_round}`);
+const baseUploadDir = path.join(__dirname, '..', 'uploads', `${currentYear}`, 'mod_customer');
+const fileUploadDir = path.join(__dirname, '..', `${import_config.file_upload_round}`);
 
-// if (!fs.existsSync(fileUploadDir)) {
-//     fs.mkdirSync(fileUploadDir, { recursive: true });
-// }
+if (!fs.existsSync(fileUploadDir)) {
+    fs.mkdirSync(fileUploadDir, { recursive: true });
+}
 
 
 const storageProfileImage = multer.diskStorage({
