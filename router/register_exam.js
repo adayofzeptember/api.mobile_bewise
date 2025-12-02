@@ -744,7 +744,7 @@ register_exam_router.post('/tiktok-pay', async (req, res) => {
 
         dataToSend.append('_method', 'CHECK_TIKTOK_PAYMENT');
         dataToSend.append('round', '1');
-        dataToSend.append('month', 'oct');
+        dataToSend.append('month', 'Oct');
         dataToSend.append('year', '2026');
 
         dataToSend.append('tiktok_code', tiktok_code);
@@ -768,8 +768,6 @@ register_exam_router.post('/tiktok-pay', async (req, res) => {
 
 
         if (responseData.status == "1") {
-
-
             const insert_gbpay = `INSERT INTO data_gb_prime_pay 
             (idcard_std, idcard) 
             VALUES (?, ?)`;
