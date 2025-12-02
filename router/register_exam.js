@@ -743,8 +743,8 @@ register_exam_router.post('/tiktok-pay', async (req, res) => {
         const dataToSend = new URLSearchParams();
 
         dataToSend.append('_method', 'CHECK_TIKTOK_PAYMENT');
-        dataToSend.append('round', '4');
-        dataToSend.append('month', 'april');
+        dataToSend.append('round', '1');
+        dataToSend.append('month', 'oct');
         dataToSend.append('year', '2026');
 
         dataToSend.append('tiktok_code', tiktok_code);

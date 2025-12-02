@@ -64,7 +64,6 @@ const uploadFile = multer({
 upload_router.post("/check_idcard", uploadFile.single("file"), async (req, res) => {
     try {
  
-
         if (!req.file) {
             return res.status(400).json({ message: "กรุณาอัปโหลดไฟล์" });
         }
