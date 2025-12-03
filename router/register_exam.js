@@ -31,13 +31,13 @@ register_exam_router.post('/register', verifyToken, async (req, res) => {
         id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng, 
         datanickname, datanickname_eng, dataage, gender, datanation, datatel, dataidline, dataemail, dataadd, 
         districts, amphures, provinces, zip_code, dataschool, provinces_school,school_type, datalevel, 
-        dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, date_regis, branch, databd, file_idcard, status_file_id
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'doc_correct');`;
+        dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, date_regis, branch, databd, file_idcard, file_gpa, status_file_id, status_file_gpa
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'doc_correct', 'doc_correct');`;
 
         db_bewsie.query(query_exam_register, [id_customer, city, idcard, prefix, dataname, surname, prefix_eng, dataname_eng, surname_eng,
             datanickname, datanickname_eng, dataage, gender, datanation, datatel, dataidline, dataemail, dataadd,
             districts, amphurs, provinces, zip_code, dataschool, provinces_school, school_type, datalevel,
-            dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, formattedDate, code_branch, databd, file_idcard], (err, results) => {
+            dataparent, dataparenttel, dataparentrelationship, regis_type_to, regis_buy, formattedDate, code_branch, databd, file_idcard, file_idcard], (err, results) => {
                 if (err) {
                     console.error('Error inserting register exam:', err);
                     return res.status(500).json({ message: 'error', err });

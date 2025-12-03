@@ -6,11 +6,11 @@ module.exports = {
         date: '18 มกราคม 2568',
         time: '12.00 - 14.30 น.'
     },
-    //
+
     file_upload_round: 'file_BWG_Oct_R1_2026',
-    //data_register_round: 'dataregister_2026_april_r4'
     data_register_round: 'dataregister_2026_oct_r1',
 
+    
     // tiktok: {
     //     round: '18 มกราคม 2568',
     //     month: '12.00 - 14.30 น.',
