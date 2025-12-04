@@ -3,7 +3,7 @@ module.exports = {
     targetMonth: 1,
     // วันสอบ
     datetime: {
-        date: '18 มกราคม 2568',
+        date: '18 มกราคม 2569',
         time: '12.00 - 14.30 น.'
     },
 
